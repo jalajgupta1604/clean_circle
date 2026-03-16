@@ -1,0 +1,10 @@
+<div class="max-w-2xl mx-auto">
+  <h1 class="text-2xl font-bold text-gray-900 mb-6">Subscription Details</h1>
+  <div class="bg-white shadow rounded-lg p-6 space-y-4">
+    <div><span class="text-sm font-medium text-gray-500">User</span><p class="text-gray-900"><%= @subscription.user.name %> (<%= @subscription.user.email %>)</p></div>
+    <div><span class="text-sm font-medium text-gray-500">Plan</span><p class="text-gray-900"><%= @subscription.subscription_plan.name %> - <%= format_currency(@subscription.subscription_plan.price) %>/month</p></div>
+    <div><span class="text-sm font-medium text-gray-500">Status</span><p><%= subscription_status_badge(@subscription.status) %></p></div>
+    <div><span class="text-sm font-medium text-gray-500">Period</span><p class="text-gray-900"><%= @subscription.starts_on %> to <%= @subscription.ends_on %></p></div>
+    <div><span class="text-sm font-medium text-gray-500">Days Remaining</span><p class="text-gray-900"><%= @subscription.days_remaining %></p></div>
+  </div>
+</div>

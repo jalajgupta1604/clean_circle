@@ -1,0 +1,97 @@
+<%# Subscription Details %>
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mb-6">
+    <%= link_to root_path, class: "inline-flex items-center text-sm text-gray-500 hover:text-emerald-600 transition-colors" do %>
+      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      Back to Dashboard
+    <% end %>
+  </div>
+
+  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+    <div>
+      <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">My Subscription</h1>
+      <p class="mt-1 text-gray-500">Manage your waste collection plan</p>
+    </div>
+  </div>
+
+  <% if @subscription.present? %>
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      <%# Plan Header %>
+      <div class="bg-gradient-to-r from-emerald-600 to-emerald-700 p-6 sm:p-8 text-white">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-white/20 backdrop-blur-sm mb-3">
+              Active Plan
+            </span>
+            <h2 class="text-2xl sm:text-3xl font-bold"><%= @subscription.subscription_plan.name %></h2>
+            <p class="text-emerald-100 mt-1"><%= @subscription.subscription_plan.bucket_size %> L waste bucket</p>
+          </div>
+          <div class="text-left sm:text-right">
+            <p class="text-3xl font-extrabold">&#8377;<%= @subscription.subscription_plan.price.to_i %></p>
+            <p class="text-emerald-200 text-sm">per month</p>
+          </div>
+        </div>
+      </div>
+
+      <%# Plan Details %>
+      <div class="p-6 sm:p-8">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+          <div class="bg-gray-50 rounded-xl p-5">
+            <p class="text-sm font-medium text-gray-500 mb-1">Started On</p>
+            <p class="text-lg font-bold text-gray-900"><%= @subscription.starts_on.strftime("%b %d, %Y") %></p>
+          </div>
+          <div class="bg-gray-50 rounded-xl p-5">
+            <p class="text-sm font-medium text-gray-500 mb-1">Ends On</p>
+            <p class="text-lg font-bold text-gray-900"><%= @subscription.ends_on.strftime("%b %d, %Y") %></p>
+          </div>
+          <div class="bg-gray-50 rounded-xl p-5">
+            <p class="text-sm font-medium text-gray-500 mb-1">Days Remaining</p>
+            <% days_remaining = (@subscription.ends_on - Date.today).to_i %>
+            <p class="text-lg font-bold <%= days_remaining <= 7 ? 'text-red-600' : 'text-gray-900' %>">
+              <%= days_remaining %> days
+            </p>
+            <% if days_remaining <= 7 %>
+              <p class="text-xs text-red-500 mt-1">Renew soon to avoid service interruption</p>
+            <% end %>
+          </div>
+        </div>
+
+        <%# Progress Bar %>
+        <div class="mb-8">
+          <div class="flex items-center justify-between text-sm text-gray-500 mb-2">
+            <span>Plan Duration</span>
+            <% total_days = (@subscription.ends_on - @subscription.starts_on).to_i %>
+            <% elapsed = (Date.today - @subscription.starts_on).to_i %>
+            <% progress = [(elapsed.to_f / total_days * 100), 100].min %>
+            <span><%= elapsed %> of <%= total_days %> days used</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-3">
+            <div class="bg-emerald-600 h-3 rounded-full transition-all duration-500" style="width: <%= progress %>%"></div>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-3">
+          <%= link_to new_subscription_path, class: "inline-flex items-center justify-center px-6 py-3 bg-emerald-600 text-white rounded-xl font-medium hover:bg-emerald-700 transition-colors" do %>
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            Change Plan
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% else %>
+    <%# No Active Subscription %>
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-12 text-center">
+      <div class="w-20 h-20 mx-auto flex items-center justify-center rounded-full bg-gray-100 text-gray-400 mb-6">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+      </div>
+      <h2 class="text-xl font-bold text-gray-900 mb-2">No Active Subscription</h2>
+      <p class="text-gray-500 max-w-md mx-auto mb-8">
+        You don't have an active waste collection plan. Subscribe to start receiving doorstep pickup services.
+      </p>
+      <%= link_to new_subscription_path, class: "inline-flex items-center px-6 py-3 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700 transition-colors" do %>
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+        Choose a Plan
+      <% end %>
+    </div>
+  <% end %>
+</div>

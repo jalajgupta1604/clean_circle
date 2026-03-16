@@ -1,0 +1,56 @@
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <h2 class="text-2xl font-bold text-gray-900">Routes</h2>
+    <%= link_to new_admin_route_path, class: "inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 transition-colors" do %>
+      <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      New Route
+    <% end %>
+  </div>
+
+  <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Area</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Agent</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Households</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @routes.each do |route| %>
+            <tr class="hover:bg-gray-50 transition-colors">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= route.name %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700"><%= route.area %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                <% if route.agent.present? %>
+                  <%= link_to route.agent.name, admin_agent_path(route.agent), class: "text-indigo-600 hover:text-indigo-900" %>
+                <% else %>
+                  <span class="text-gray-400">Unassigned</span>
+                <% end %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">
+                  <%= route.households.count %>
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-3">
+                <%= link_to "View", admin_route_path(route), class: "text-indigo-600 hover:text-indigo-900 font-medium" %>
+                <%= link_to "Edit", edit_admin_route_path(route), class: "text-gray-600 hover:text-gray-900 font-medium" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <% if defined?(@pagy) && @pagy %>
+      <div class="border-t border-gray-200 px-6 py-4">
+        <%== pagy_nav(@pagy) %>
+      </div>
+    <% end %>
+  </div>
+</div>

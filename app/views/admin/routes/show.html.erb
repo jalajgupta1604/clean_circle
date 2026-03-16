@@ -1,0 +1,80 @@
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+      <%= link_to admin_routes_path, class: "text-gray-400 hover:text-gray-600" do %>
+        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+      <% end %>
+      <h2 class="text-2xl font-bold text-gray-900"><%= @route.name %></h2>
+    </div>
+    <div class="flex space-x-3">
+      <%= link_to "Edit", edit_admin_route_path(@route), class: "inline-flex items-center rounded-lg bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50 transition-colors" %>
+      <%= link_to "Delete", admin_route_path(@route), data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this route?" }, class: "inline-flex items-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 transition-colors" %>
+    </div>
+  </div>
+
+  <!-- Route Info -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Route Details</h3>
+      <dl class="space-y-3">
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Name</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @route.name %></dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Area</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @route.area %></dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Assigned Agent</dt>
+          <dd class="mt-1 text-sm text-gray-900">
+            <% if @route.agent.present? %>
+              <%= link_to @route.agent.name, admin_agent_path(@route.agent), class: "text-indigo-600 hover:text-indigo-900" %>
+            <% else %>
+              <span class="text-gray-400">Unassigned</span>
+            <% end %>
+          </dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Total Households</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @route.households.count %></dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="lg:col-span-2">
+      <!-- Households List -->
+      <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h3 class="text-lg font-semibold text-gray-900">Households on this Route</h3>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Address</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">User</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Family Size</th>
+                <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <% @route.households.each do |household| %>
+                <tr class="hover:bg-gray-50 transition-colors">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= household.address %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700"><%= household.user&.name %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700"><%= household.user&.family_size %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                    <%= link_to "View", admin_household_path(household), class: "text-indigo-600 hover:text-indigo-900 font-medium" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,183 @@
+<%# Customer Dashboard %>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+  <%# Welcome Banner %>
+  <div class="bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-2xl p-6 sm:p-8 mb-8 text-white">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-bold">Welcome back, <%= current_user.name %>!</h1>
+        <p class="mt-1 text-emerald-100">Here's your waste management overview for today.</p>
+      </div>
+      <div class="flex gap-3">
+        <%= link_to wallet_path, class: "inline-flex items-center px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-sm font-medium transition-colors" do %>
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+          Recharge Wallet
+        <% end %>
+        <% if current_user.household %>
+          <%= link_to qr_code_path, class: "inline-flex items-center px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-sm font-medium transition-colors" do %>
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+            View QR Code
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <%# Stats Cards %>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <%# Wallet Balance %>
+    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+      <div class="flex items-center justify-between mb-4">
+        <div class="w-12 h-12 flex items-center justify-center rounded-lg bg-emerald-100 text-emerald-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+        </div>
+        <%= link_to "Recharge", wallet_path, class: "text-sm text-emerald-600 hover:text-emerald-700 font-medium" %>
+      </div>
+      <p class="text-sm font-medium text-gray-500">Wallet Balance</p>
+      <p class="text-2xl font-bold text-gray-900 mt-1">&#8377;<%= @wallet_balance %></p>
+    </div>
+
+    <%# Active Plan %>
+    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+      <div class="flex items-center justify-between mb-4">
+        <div class="w-12 h-12 flex items-center justify-center rounded-lg bg-blue-100 text-blue-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+        </div>
+        <%= link_to "Manage", subscriptions_path, class: "text-sm text-emerald-600 hover:text-emerald-700 font-medium" %>
+      </div>
+      <p class="text-sm font-medium text-gray-500">Active Plan</p>
+      <p class="text-2xl font-bold text-gray-900 mt-1"><%= @subscription&.subscription_plan&.name || "None" %></p>
+    </div>
+
+    <%# Total Pickups %>
+    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+      <div class="flex items-center justify-between mb-4">
+        <div class="w-12 h-12 flex items-center justify-center rounded-lg bg-amber-100 text-amber-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+        </div>
+        <%= link_to "View All", pickups_path, class: "text-sm text-emerald-600 hover:text-emerald-700 font-medium" %>
+      </div>
+      <p class="text-sm font-medium text-gray-500">Total Pickups</p>
+      <p class="text-2xl font-bold text-gray-900 mt-1"><%= @total_pickups %></p>
+    </div>
+
+    <%# Monthly Waste %>
+    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+      <div class="flex items-center justify-between mb-4">
+        <div class="w-12 h-12 flex items-center justify-center rounded-lg bg-purple-100 text-purple-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        </div>
+        <%= link_to "Track", waste_tracking_path, class: "text-sm text-emerald-600 hover:text-emerald-700 font-medium" %>
+      </div>
+      <p class="text-sm font-medium text-gray-500">This Month Waste</p>
+      <p class="text-2xl font-bold text-gray-900 mt-1"><%= @monthly_waste %> L</p>
+    </div>
+  </div>
+
+  <%# Quick Actions & Recent Pickups %>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+    <%# Recent Pickups %>
+    <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm">
+      <div class="flex items-center justify-between p-6 border-b border-gray-100">
+        <h2 class="text-lg font-bold text-gray-900">Recent Pickups</h2>
+        <%= link_to "View All", pickups_path, class: "text-sm text-emerald-600 hover:text-emerald-700 font-medium" %>
+      </div>
+
+      <% if @recent_pickups.present? %>
+        <div class="divide-y divide-gray-100">
+          <% @recent_pickups.each do |pickup| %>
+            <div class="flex items-center justify-between p-4 sm:p-6 hover:bg-gray-50 transition-colors">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 flex items-center justify-center rounded-full
+                  <%= case pickup.status
+                      when 'completed' then 'bg-green-100 text-green-600'
+                      when 'scheduled' then 'bg-blue-100 text-blue-600'
+                      when 'in_progress' then 'bg-yellow-100 text-yellow-600'
+                      when 'missed' then 'bg-red-100 text-red-600'
+                      when 'cancelled' then 'bg-gray-100 text-gray-600'
+                      end %>">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+                </div>
+                <div>
+                  <p class="font-medium text-gray-900"><%= pickup.created_at.strftime("%b %d, %Y") %></p>
+                  <p class="text-sm text-gray-500"><%= pickup.estimated_volume %> L estimated</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold
+                  <%= case pickup.status
+                      when 'completed' then 'bg-green-100 text-green-700'
+                      when 'scheduled' then 'bg-blue-100 text-blue-700'
+                      when 'in_progress' then 'bg-yellow-100 text-yellow-700'
+                      when 'missed' then 'bg-red-100 text-red-700'
+                      when 'cancelled' then 'bg-gray-100 text-gray-700'
+                      end %>">
+                  <%= pickup.status.titleize %>
+                </span>
+                <%= link_to pickup_path(pickup), class: "text-gray-400 hover:text-gray-600" do %>
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="p-12 text-center">
+          <svg class="w-12 h-12 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+          <p class="text-gray-500">No pickups yet. Your first pickup will appear here.</p>
+        </div>
+      <% end %>
+    </div>
+
+    <%# Quick Actions %>
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
+      <div class="p-6 border-b border-gray-100">
+        <h2 class="text-lg font-bold text-gray-900">Quick Actions</h2>
+      </div>
+      <div class="p-6 space-y-3">
+        <%= link_to wallet_path, class: "flex items-center gap-4 p-4 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 transition-colors group" do %>
+          <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-emerald-600 text-white group-hover:bg-emerald-700 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+          </div>
+          <div>
+            <p class="font-semibold">Recharge Wallet</p>
+            <p class="text-sm text-emerald-600">Add funds to your wallet</p>
+          </div>
+        <% end %>
+
+        <% if current_user.household %>
+          <%= link_to qr_code_path, class: "flex items-center gap-4 p-4 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 transition-colors group" do %>
+            <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-blue-600 text-white group-hover:bg-blue-700 transition-colors">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+            </div>
+            <div>
+              <p class="font-semibold">View QR Code</p>
+              <p class="text-sm text-blue-600">Show your household QR</p>
+            </div>
+          <% end %>
+        <% end %>
+
+        <%= link_to waste_tracking_path, class: "flex items-center gap-4 p-4 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 transition-colors group" do %>
+          <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-purple-600 text-white group-hover:bg-purple-700 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          </div>
+          <div>
+            <p class="font-semibold">Track Waste</p>
+            <p class="text-sm text-purple-600">View your waste analytics</p>
+          </div>
+        <% end %>
+
+        <%= link_to subscriptions_path, class: "flex items-center gap-4 p-4 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 transition-colors group" do %>
+          <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-amber-600 text-white group-hover:bg-amber-700 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+          </div>
+          <div>
+            <p class="font-semibold">Manage Plan</p>
+            <p class="text-sm text-amber-600">View or change subscription</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

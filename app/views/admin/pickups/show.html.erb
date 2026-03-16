@@ -1,0 +1,79 @@
+<div class="space-y-6">
+  <div class="flex items-center space-x-3">
+    <%= link_to admin_pickups_path, class: "text-gray-400 hover:text-gray-600" do %>
+      <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+      </svg>
+    <% end %>
+    <h2 class="text-2xl font-bold text-gray-900">Pickup #<%= @pickup.id %></h2>
+    <% status_classes = { "completed" => "bg-green-100 text-green-800", "pending" => "bg-yellow-100 text-yellow-800", "missed" => "bg-red-100 text-red-800", "in_progress" => "bg-blue-100 text-blue-800" } %>
+    <span class="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium <%= status_classes[@pickup.status] || 'bg-gray-100 text-gray-800' %>">
+      <%= @pickup.status&.humanize %>
+    </span>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Pickup Details -->
+    <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Pickup Details</h3>
+      <dl class="space-y-3">
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Status</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @pickup.status&.humanize %></dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Scheduled At</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @pickup.created_at&.strftime("%B %d, %Y at %I:%M %p") %></dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Completed At</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @pickup.confirmed_at&.strftime("%B %d, %Y at %I:%M %p") || "Not yet completed" %></dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Notes</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @pickup.notes.presence || "No notes" %></dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Created At</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @pickup.created_at.strftime("%B %d, %Y at %I:%M %p") %></dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- Related Info -->
+    <div class="space-y-6">
+      <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Household</h3>
+        <% if @pickup.household.present? %>
+          <p class="text-sm text-gray-900"><%= @pickup.household.address %></p>
+          <p class="text-sm text-gray-500 mt-1">User: <%= @pickup.household.user&.name %></p>
+          <%= link_to "View Household", admin_household_path(@pickup.household), class: "mt-3 inline-block text-sm text-indigo-600 hover:text-indigo-800 font-medium" %>
+        <% else %>
+          <p class="text-sm text-gray-500">N/A</p>
+        <% end %>
+      </div>
+
+      <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Agent</h3>
+        <% if @pickup.agent.present? %>
+          <p class="text-sm text-gray-900"><%= @pickup.agent.name %></p>
+          <p class="text-sm text-gray-500 mt-1"><%= @pickup.agent.email %></p>
+          <%= link_to "View Agent", admin_agent_path(@pickup.agent), class: "mt-3 inline-block text-sm text-indigo-600 hover:text-indigo-800 font-medium" %>
+        <% else %>
+          <p class="text-sm text-gray-500">Unassigned</p>
+        <% end %>
+      </div>
+
+      <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Route</h3>
+        <% if @pickup.route.present? %>
+          <p class="text-sm text-gray-900"><%= @pickup.route.name %></p>
+          <p class="text-sm text-gray-500 mt-1">Area: <%= @pickup.route.area %></p>
+          <%= link_to "View Route", admin_route_path(@pickup.route), class: "mt-3 inline-block text-sm text-indigo-600 hover:text-indigo-800 font-medium" %>
+        <% else %>
+          <p class="text-sm text-gray-500">N/A</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

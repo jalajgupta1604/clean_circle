@@ -1,0 +1,64 @@
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <h2 class="text-2xl font-bold text-gray-900">Users</h2>
+    <%= link_to new_admin_user_path, class: "inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 transition-colors" do %>
+      <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      New User
+    <% end %>
+  </div>
+
+  <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Email</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Phone</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Role</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Created</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @users.each do |user| %>
+            <tr class="hover:bg-gray-50 transition-colors">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center">
+                    <span class="text-sm font-medium text-indigo-700"><%= user.name&.first&.upcase %></span>
+                  </div>
+                  <div class="ml-3">
+                    <p class="text-sm font-medium text-gray-900"><%= user.name %></p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700"><%= user.email %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700"><%= user.phone %></td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <% role_classes = {
+                  "admin" => "bg-indigo-100 text-indigo-800",
+                  "agent" => "bg-green-100 text-green-800",
+                  "user" => "bg-gray-100 text-gray-800"
+                } %>
+                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium <%= role_classes[user.role] || 'bg-gray-100 text-gray-800' %>">
+                  <%= user.role&.capitalize %>
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= user.created_at.strftime("%b %d, %Y") %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-3">
+                <%= link_to "View", admin_user_path(user), class: "text-indigo-600 hover:text-indigo-900 font-medium" %>
+                <%= link_to "Edit", edit_admin_user_path(user), class: "text-gray-600 hover:text-gray-900 font-medium" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <div class="border-t border-gray-200 px-6 py-4">
+      <%== pagy_nav(@pagy) %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,12 @@
+<div class="space-y-6">
+  <div class="flex items-center space-x-3">
+    <%= link_to admin_routes_path, class: "text-gray-400 hover:text-gray-600" do %>
+      <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+      </svg>
+    <% end %>
+    <h2 class="text-2xl font-bold text-gray-900">New Route</h2>
+  </div>
+
+  <%= render "form", route: @route %>
+</div>

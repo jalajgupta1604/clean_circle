@@ -1,0 +1,259 @@
+Design a modern SaaS web application and mobile app interface for a smart waste management platform called CleanCircle.
+
+The product is a subscription-based door-to-door waste collection platform that helps households track and reduce waste while paying based on bucket size.
+
+The system includes three interfaces:
+
+Household customer web/mobile app
+
+Waste collection agent mobile app
+
+Admin operations dashboard
+
+The design should follow modern SaaS design patterns similar to Stripe, Uber, and Notion dashboards.
+
+Use a clean sustainability theme with colors such as green, white, and soft grey.
+
+Product Overview
+
+CleanCircle enables households to:
+
+• subscribe to waste collection
+• choose bucket sizes (10L, 25L, 50L)
+• maintain a prepaid wallet
+• track waste generation
+• earn rewards for reducing waste
+
+Waste collectors confirm pickups using a mobile app, and the platform tracks waste analytics.
+
+Core UX Principles
+
+Design should emphasize:
+
+• simplicity
+• transparency
+• environmental awareness
+• gamification
+• operational efficiency
+
+The UI should feel friendly, trustworthy, and sustainability-focused.
+
+Interface 1 — Household Customer App
+
+Design screens for the following user journey.
+
+1. Onboarding / Signup
+
+Include:
+
+• Google login
+• Mobile OTP verification
+• Address selection using map
+• Household details (family size)
+
+Goal: frictionless onboarding.
+
+2. Plan Selection Screen
+
+Allow user to choose bucket size:
+
+10L — small households
+25L — medium households
+50L — large households
+
+Display:
+
+• price per month
+• pickups included
+• environmental impact message
+
+Show this as interactive subscription cards.
+
+3. Wallet Dashboard
+
+Display:
+
+• wallet balance
+• recharge button
+• transaction history
+• auto recharge option
+
+Design like a fintech wallet interface.
+
+4. Waste Tracking Dashboard
+
+Show analytics such as:
+
+• monthly waste volume
+• pickup history
+• waste reduction trend
+• environmental score
+
+Use:
+
+• charts
+• progress bars
+• sustainability badges
+
+Gamify the experience.
+
+5. Pickup History
+
+List of:
+
+• date
+• bucket size
+• collector confirmation
+• GPS verification
+
+Allow users to report missed pickups.
+
+6. Rewards & Eco Score
+
+Display:
+
+• reward points
+• cashback earned
+• waste reduction achievements
+• eco badges
+
+Include leaderboard concept for societies.
+
+Interface 2 — Waste Collector Agent App
+
+Design a simple mobile-first interface optimized for field workers.
+
+Agent Home Screen
+
+Display:
+
+• today's route
+• number of pickups remaining
+• quick start button
+
+Household Pickup Screen
+
+Show:
+
+• household name
+• address
+• QR scan button
+• confirm pickup button
+• mark missed pickup option
+
+Include large touch buttons for fast usage.
+
+Route View
+
+Map interface showing:
+
+• next pickup
+• optimized route
+• completed pickups
+
+Daily Performance
+
+Show:
+
+• pickups completed
+• missed pickups
+• route efficiency
+
+Interface 3 — Admin Dashboard
+
+Design a powerful SaaS operations dashboard.
+
+Admin Overview
+
+Display metrics:
+
+• total households
+• pickups today
+• active agents
+• monthly revenue
+• waste collected
+
+Use modern data visualization cards.
+
+Household Management
+
+Admin can:
+
+• view households
+• change plans
+• manage wallet balances
+• view pickup history
+
+Agent Management
+
+Features:
+
+• add agents
+• assign routes
+• monitor performance
+
+Include route assignment UI.
+
+Waste Analytics
+
+Charts showing:
+
+• waste by area
+• waste by bucket size
+• reduction trends
+• recycling rates
+
+Design Style
+
+Use:
+
+• minimalistic SaaS UI
+• rounded cards
+• soft shadows
+• modern typography
+• simple iconography
+
+Design should feel like a modern climate-tech platform.
+
+Key UI Components
+
+Include reusable components such as:
+
+• subscription cards
+• wallet cards
+• analytics charts
+• QR scanner interface
+• route maps
+• progress indicators
+• sustainability badges
+
+Responsiveness
+
+Design for:
+
+• mobile devices
+• tablets
+• desktop dashboard
+
+Mobile-first approach for field agents.
+
+Visual Tone
+
+The product should communicate:
+
+• sustainability
+• trust
+• transparency
+• modern urban infrastructure
+
+Use eco-friendly visuals like leaf icons, recycling indicators, and green progress meters.
+
+Final Output
+
+Generate:
+
+• complete UI screen flows
+• component library
+• SaaS dashboard layout
+• mobile app layouts
+• interaction states

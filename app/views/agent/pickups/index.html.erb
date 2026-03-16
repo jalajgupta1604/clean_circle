@@ -1,0 +1,60 @@
+<% content_for(:title, "Pickups - #{@route.name} - CleanCircle Agent") %>
+
+<div class="mb-5">
+  <div class="flex items-center text-sm text-gray-500 mb-2">
+    <%= link_to "My Routes", agent_routes_path, class: "text-blue-600 hover:text-blue-800" %>
+    <svg class="w-4 h-4 mx-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    <%= link_to @route.name, agent_route_path(@route), class: "text-blue-600 hover:text-blue-800" %>
+    <svg class="w-4 h-4 mx-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    <span class="text-gray-700">Pickups</span>
+  </div>
+  <h1 class="text-xl font-bold text-gray-900">Pickups for <%= @route.name %></h1>
+</div>
+
+<%# Filter tabs %>
+<div class="flex space-x-2 mb-4 overflow-x-auto pb-1">
+  <% statuses = [["All", nil], ["Scheduled", "scheduled"], ["In Progress", "in_progress"], ["Completed", "completed"], ["Missed", "missed"]] %>
+  <% current_filter = params[:status] %>
+  <% statuses.each do |label, value| %>
+    <%= link_to label, agent_route_pickups_path(@route, status: value),
+      class: "flex-shrink-0 px-3 py-1.5 rounded-full text-sm font-medium transition #{current_filter == value ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50'}" %>
+  <% end %>
+</div>
+
+<%# Pickups list %>
+<% if @pickups.any? %>
+  <div class="space-y-2">
+    <% @pickups.each do |pickup| %>
+      <%= link_to agent_pickup_path(pickup), class: "block bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:border-blue-300 transition" do %>
+        <div class="flex items-center justify-between">
+          <div class="min-w-0 flex-1">
+            <p class="text-sm font-medium text-gray-900 truncate"><%= pickup.household.address %></p>
+            <p class="text-xs text-gray-500 mt-0.5">
+              <% if pickup.confirmed_at.present? %>
+                Completed at <%= pickup.confirmed_at.strftime("%-I:%M %p") %>
+              <% elsif pickup.created_at.present? %>
+                Scheduled for <%= pickup.created_at.strftime("%b %d, %Y") %>
+              <% end %>
+            </p>
+          </div>
+          <div class="ml-3 flex-shrink-0">
+            <% case pickup.status %>
+            <% when "scheduled" %>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Scheduled</span>
+            <% when "in_progress" %>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">In Progress</span>
+            <% when "completed" %>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Completed</span>
+            <% when "missed" %>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Missed</span>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+<% else %>
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 px-4 py-12 text-center">
+    <p class="text-sm text-gray-400">No pickups found<%= " with status '#{params[:status]}'" if params[:status].present? %>.</p>
+  </div>
+<% end %>

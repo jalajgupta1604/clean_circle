@@ -1,0 +1,86 @@
+<% content_for(:title, "Pickup ##{@pickup.id} - CleanCircle Agent") %>
+
+<div class="mb-5">
+  <div class="flex items-center text-sm text-gray-500 mb-2">
+    <%= link_to "My Routes", agent_routes_path, class: "text-blue-600 hover:text-blue-800" %>
+    <svg class="w-4 h-4 mx-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    <span class="text-gray-700">Pickup #<%= @pickup.id %></span>
+  </div>
+  <h1 class="text-xl font-bold text-gray-900">Pickup Details</h1>
+</div>
+
+<%# Status banner %>
+<div class="mb-4">
+  <% case @pickup.status %>
+  <% when "scheduled" %>
+    <div class="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 flex items-center">
+      <div class="w-3 h-3 rounded-full bg-blue-500 mr-3 flex-shrink-0"></div>
+      <span class="text-sm font-medium text-blue-800">Scheduled</span>
+    </div>
+  <% when "in_progress" %>
+    <div class="bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3 flex items-center">
+      <div class="w-3 h-3 rounded-full bg-yellow-500 mr-3 flex-shrink-0 animate-pulse"></div>
+      <span class="text-sm font-medium text-yellow-800">In Progress</span>
+    </div>
+  <% when "completed" %>
+    <div class="bg-green-50 border border-green-200 rounded-xl px-4 py-3 flex items-center">
+      <div class="w-3 h-3 rounded-full bg-green-500 mr-3 flex-shrink-0"></div>
+      <span class="text-sm font-medium text-green-800">Completed</span>
+    </div>
+  <% when "missed" %>
+    <div class="bg-red-50 border border-red-200 rounded-xl px-4 py-3 flex items-center">
+      <div class="w-3 h-3 rounded-full bg-red-500 mr-3 flex-shrink-0"></div>
+      <span class="text-sm font-medium text-red-800">Missed</span>
+    </div>
+  <% end %>
+</div>
+
+<%# Household info %>
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-4">
+  <div class="px-4 py-3 border-b border-gray-200">
+    <h2 class="text-base font-semibold text-gray-900">Household Information</h2>
+  </div>
+  <div class="px-4 py-3 space-y-3">
+    <div>
+      <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Address</p>
+      <p class="text-sm text-gray-900 mt-0.5"><%= @pickup.household.address %></p>
+    </div>
+    <% if @pickup.household.building_name.present? %>
+      <div>
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Building</p>
+        <p class="text-sm text-gray-900 mt-0.5"><%= @pickup.household.building_name %></p>
+      </div>
+    <% end %>
+    <% if @pickup.household.unit_number.present? %>
+      <div>
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Unit</p>
+        <p class="text-sm text-gray-900 mt-0.5"><%= @pickup.household.unit_number %></p>
+      </div>
+    <% end %>
+    <div>
+      <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Scheduled Date</p>
+      <p class="text-sm text-gray-900 mt-0.5"><%= @pickup.created_at.strftime("%B %d, %Y") %></p>
+    </div>
+    <% if @pickup.confirmed_at.present? %>
+      <div>
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Completed At</p>
+        <p class="text-sm text-gray-900 mt-0.5"><%= @pickup.confirmed_at.strftime("%B %d, %Y at %-I:%M %p") %></p>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<%# Action buttons %>
+<% unless @pickup.status.in?(["completed", "missed"]) %>
+  <div class="flex space-x-3">
+    <%= button_to "Confirm Pickup", confirm_agent_pickup_path(@pickup),
+      method: :patch,
+      class: "flex-1 bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-3 rounded-xl shadow-sm transition text-center",
+      data: { turbo_confirm: "Confirm this pickup as completed?" } %>
+
+    <%= button_to "Mark Missed", mark_missed_agent_pickup_path(@pickup),
+      method: :patch,
+      class: "flex-1 bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-3 rounded-xl shadow-sm transition text-center",
+      data: { turbo_confirm: "Mark this pickup as missed?" } %>
+  </div>
+<% end %>

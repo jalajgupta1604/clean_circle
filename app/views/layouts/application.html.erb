@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html class="h-full bg-gray-50">
+  <head>
+    <title><%= content_for(:title) || "CleanCircle" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= yield :head %>
+    <link rel="icon" href="/icon.png" type="image/png">
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="h-full">
+    <% if user_signed_in? %>
+      <nav class="bg-emerald-700 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between h-16">
+            <div class="flex items-center">
+              <a href="<%= root_path %>" class="text-white text-xl font-bold tracking-tight">
+                CleanCircle
+              </a>
+              <% if current_user.customer? %>
+                <div class="hidden md:flex ml-10 space-x-4">
+                  <%= link_to "Dashboard", root_path, class: "text-emerald-100 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
+                  <%= link_to "Pickups", pickups_path, class: "text-emerald-100 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
+                  <%= link_to "Wallet", wallet_path, class: "text-emerald-100 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
+                  <%= link_to "Subscription", subscriptions_path, class: "text-emerald-100 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
+                  <%= link_to "Waste Tracking", waste_tracking_path, class: "text-emerald-100 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
+                </div>
+              <% end %>
+            </div>
+            <div class="flex items-center space-x-4">
+              <% if current_user.customer? %>
+                <%= link_to notifications_path, class: "relative text-emerald-100 hover:text-white" do %>
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                  <% unread_count = current_user.notifications.unread.count %>
+                  <% if unread_count > 0 %>
+                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center"><%= unread_count > 9 ? "9+" : unread_count %></span>
+                  <% end %>
+                <% end %>
+              <% end %>
+              <span class="text-emerald-100 text-sm"><%= current_user.name %></span>
+              <%= button_to "Sign Out", destroy_user_session_path, method: :delete, class: "text-emerald-100 hover:text-white text-sm bg-emerald-800 px-3 py-1.5 rounded-md" %>
+            </div>
+          </div>
+        </div>
+      </nav>
+    <% end %>
+
+    <% if notice.present? %>
+      <div class="max-w-7xl mx-auto px-4 mt-4">
+        <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-lg" role="alert"><%= notice %></div>
+      </div>
+    <% end %>
+    <% if alert.present? %>
+      <div class="max-w-7xl mx-auto px-4 mt-4">
+        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg" role="alert"><%= alert %></div>
+      </div>
+    <% end %>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <%= yield %>
+    </main>
+
+    <% if !user_signed_in? || current_user.customer? %>
+      <footer class="bg-gray-800 text-gray-400 py-8 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center text-sm">
+          <p>&copy; <%= Date.current.year %> CleanCircle. Building a cleaner tomorrow.</p>
+        </div>
+      </footer>
+    <% end %>
+  </body>
+</html>

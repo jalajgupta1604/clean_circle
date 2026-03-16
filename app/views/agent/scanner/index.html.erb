@@ -1,0 +1,93 @@
+<% content_for(:title, "QR Scanner - CleanCircle Agent") %>
+
+<div class="mb-5">
+  <h1 class="text-xl font-bold text-gray-900">QR Scanner</h1>
+  <p class="text-sm text-gray-500 mt-1">Scan or enter a household QR code to verify pickup</p>
+</div>
+
+<%# Manual QR code entry %>
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-5">
+  <%= form_tag agent_scan_verify_path, method: :post, class: "space-y-3" do %>
+    <div>
+      <label for="qr_code" class="block text-sm font-medium text-gray-700 mb-1">QR Code</label>
+      <input type="text" name="qr_code" id="qr_code" value="<%= params[:qr_code] %>"
+        placeholder="Enter or scan QR code..."
+        autofocus
+        class="block w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+    </div>
+    <button type="submit"
+      class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2.5 rounded-lg shadow-sm transition flex items-center justify-center">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      Verify Code
+    </button>
+  <% end %>
+</div>
+
+<%# Result area %>
+<% if @household.present? %>
+  <div class="bg-white rounded-xl shadow-sm border border-blue-200 overflow-hidden">
+    <div class="bg-blue-50 px-4 py-3 border-b border-blue-200">
+      <h2 class="text-sm font-semibold text-blue-800 flex items-center">
+        <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Household Found
+      </h2>
+    </div>
+    <div class="px-4 py-3 space-y-3">
+      <div>
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Address</p>
+        <p class="text-sm text-gray-900 mt-0.5"><%= @household.address %></p>
+      </div>
+      <% if @household.building_name.present? %>
+        <div>
+          <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Building</p>
+          <p class="text-sm text-gray-900 mt-0.5"><%= @household.building_name %></p>
+        </div>
+      <% end %>
+      <% if @household.unit_number.present? %>
+        <div>
+          <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Unit</p>
+          <p class="text-sm text-gray-900 mt-0.5"><%= @household.unit_number %></p>
+        </div>
+      <% end %>
+
+      <%# Today's pickup status %>
+      <% today_pickup = @household.pickups.find_by(created_at: Date.current.all_day) %>
+      <% if today_pickup %>
+        <div class="pt-2 border-t border-gray-100">
+          <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Today's Pickup</p>
+          <div class="flex items-center justify-between">
+            <% case today_pickup.status %>
+            <% when "scheduled" %>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Scheduled</span>
+            <% when "in_progress" %>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">In Progress</span>
+            <% when "completed" %>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Completed</span>
+            <% when "missed" %>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Missed</span>
+            <% end %>
+            <%= link_to "View Pickup", agent_pickup_path(today_pickup),
+              class: "text-sm text-blue-600 hover:text-blue-800 font-medium" %>
+          </div>
+        </div>
+      <% else %>
+        <div class="pt-2 border-t border-gray-100">
+          <p class="text-xs text-gray-400">No pickup scheduled for today.</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% elsif params[:qr_code].present? %>
+  <div class="bg-white rounded-xl shadow-sm border border-red-200 overflow-hidden">
+    <div class="bg-red-50 px-4 py-3 border-b border-red-200">
+      <h2 class="text-sm font-semibold text-red-800 flex items-center">
+        <svg class="w-5 h-5 mr-2 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Not Found
+      </h2>
+    </div>
+    <div class="px-4 py-4 text-center">
+      <p class="text-sm text-gray-500">No household found for code "<%= params[:qr_code] %>".</p>
+      <p class="text-xs text-gray-400 mt-1">Please check the code and try again.</p>
+    </div>
+  </div>
+<% end %>

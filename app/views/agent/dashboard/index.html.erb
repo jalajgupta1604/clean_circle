@@ -1,0 +1,65 @@
+<% content_for(:title, "Dashboard - CleanCircle Agent") %>
+
+<div class="mb-6">
+  <h1 class="text-xl font-bold text-gray-900">Welcome, <%= current_user.name %></h1>
+  <p class="text-sm text-gray-500 mt-1"><%= Date.current.strftime("%A, %B %d, %Y") %></p>
+</div>
+
+<%# Today's stats %>
+<div class="grid grid-cols-2 gap-3 sm:grid-cols-4 mb-6">
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Pickups</p>
+    <p class="text-2xl font-bold text-blue-700 mt-1"><%= @total_today %></p>
+  </div>
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Completed</p>
+    <p class="text-2xl font-bold text-green-600 mt-1"><%= @completed_today %></p>
+  </div>
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Pending</p>
+    <p class="text-2xl font-bold text-yellow-600 mt-1"><%= @pending_today %></p>
+  </div>
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Missed</p>
+    <p class="text-2xl font-bold text-red-600 mt-1"><%= @missed_today %></p>
+  </div>
+</div>
+
+<%# Assigned routes %>
+<div class="bg-white rounded-xl shadow-sm border border-gray-200">
+  <div class="px-4 py-3 border-b border-gray-200">
+    <h2 class="text-base font-semibold text-gray-900">Assigned Routes</h2>
+  </div>
+
+  <% if @routes.any? %>
+    <ul class="divide-y divide-gray-100">
+      <% @routes.each do |route| %>
+        <li>
+          <%= link_to agent_route_path(route), class: "block px-4 py-3 hover:bg-gray-50 transition" do %>
+            <div class="flex items-center justify-between">
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-medium text-gray-900 truncate"><%= route.name %></p>
+                <p class="text-xs text-gray-500 mt-0.5"><%= route.area %></p>
+              </div>
+              <div class="ml-4 flex-shrink-0 text-right">
+                <% completed = route.pickups.where(status: :completed, created_at: Date.current.all_day).count %>
+                <% total = route.pickups.where(created_at: Date.current.all_day).count %>
+                <% rate = total > 0 ? ((completed.to_f / total) * 100).round : 0 %>
+                <span class="text-sm font-semibold <%= rate == 100 ? 'text-green-600' : 'text-blue-700' %>"><%= rate %>%</span>
+                <p class="text-xs text-gray-400"><%= completed %>/<%= total %> done</p>
+              </div>
+            </div>
+            <%# Progress bar %>
+            <div class="mt-2 w-full bg-gray-200 rounded-full h-1.5">
+              <div class="h-1.5 rounded-full <%= rate == 100 ? 'bg-green-500' : 'bg-blue-600' %>" style="width: <%= rate %>%"></div>
+            </div>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <div class="px-4 py-8 text-center text-sm text-gray-400">
+      No routes assigned for today.
+    </div>
+  <% end %>
+</div>

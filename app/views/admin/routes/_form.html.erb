@@ -1,0 +1,43 @@
+<%= form_with(model: [:admin, route], class: "space-y-6") do |f| %>
+  <% if route.errors.any? %>
+    <div class="rounded-lg bg-red-50 border border-red-200 p-4">
+      <div class="flex">
+        <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+        </svg>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-800"><%= pluralize(route.errors.count, "error") %> prevented this route from being saved:</h3>
+          <ul class="mt-2 list-disc list-inside text-sm text-red-700">
+            <% route.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 p-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div>
+        <%= f.label :name, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.text_field :name, class: "block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm", placeholder: "Route name" %>
+      </div>
+
+      <div>
+        <%= f.label :area, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.text_field :area, class: "block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm", placeholder: "Service area" %>
+      </div>
+
+      <div class="sm:col-span-2">
+        <%= f.label :agent_id, "Assigned Agent", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.collection_select :agent_id, @agents, :id, :name, { prompt: "Select an agent", include_blank: "Unassigned" }, class: "block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex items-center justify-end space-x-3">
+    <%= link_to "Cancel", admin_routes_path, class: "rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50 transition-colors" %>
+    <%= f.submit route.new_record? ? "Create Route" : "Update Route", class: "rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 cursor-pointer transition-colors" %>
+  </div>
+<% end %>

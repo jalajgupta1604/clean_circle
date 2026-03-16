@@ -1,0 +1,82 @@
+<%# Pickups List %>
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mb-6">
+    <%= link_to root_path, class: "inline-flex items-center text-sm text-gray-500 hover:text-emerald-600 transition-colors" do %>
+      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      Back to Dashboard
+    <% end %>
+  </div>
+
+  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+    <div>
+      <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">My Pickups</h1>
+      <p class="mt-1 text-gray-500">Track all your waste collection pickups</p>
+    </div>
+  </div>
+
+  <% if @pickups.present? %>
+    <%# Status Legend %>
+    <div class="flex flex-wrap items-center gap-4 mb-6 text-sm">
+      <span class="text-gray-500 font-medium">Status:</span>
+      <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Scheduled</span>
+      <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-yellow-500"></span> In Progress</span>
+      <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-green-500"></span> Completed</span>
+      <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> Missed</span>
+      <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-gray-400"></span> Cancelled</span>
+    </div>
+
+    <%# Pickups List %>
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      <div class="divide-y divide-gray-100">
+        <% @pickups.each do |pickup| %>
+          <%= link_to pickup_path(pickup), class: "flex items-center justify-between p-5 sm:p-6 hover:bg-gray-50 transition-colors group" do %>
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 flex items-center justify-center rounded-xl
+                <%= case pickup.status
+                    when 'completed' then 'bg-green-100 text-green-600'
+                    when 'scheduled' then 'bg-blue-100 text-blue-600'
+                    when 'in_progress' then 'bg-yellow-100 text-yellow-600'
+                    when 'missed' then 'bg-red-100 text-red-600'
+                    when 'cancelled' then 'bg-gray-100 text-gray-500'
+                    end %>">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+              </div>
+              <div>
+                <p class="font-semibold text-gray-900"><%= pickup.created_at.strftime("%A, %b %d, %Y") %></p>
+                <p class="text-sm text-gray-500 mt-0.5">
+                  Estimated volume: <span class="font-medium"><%= pickup.estimated_volume %> L</span>
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
+                <%= case pickup.status
+                    when 'completed' then 'bg-green-100 text-green-700'
+                    when 'scheduled' then 'bg-blue-100 text-blue-700'
+                    when 'in_progress' then 'bg-yellow-100 text-yellow-700'
+                    when 'missed' then 'bg-red-100 text-red-700'
+                    when 'cancelled' then 'bg-gray-100 text-gray-700'
+                    end %>">
+                <%= pickup.status.titleize %>
+              </span>
+              <svg class="w-5 h-5 text-gray-300 group-hover:text-gray-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Pagination %>
+    <% if defined?(pagy) && @pagy %>
+      <div class="mt-6">
+        <%== pagy_nav(@pagy) %>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-12 text-center">
+      <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+      <h2 class="text-xl font-bold text-gray-900 mb-2">No Pickups Yet</h2>
+      <p class="text-gray-500 max-w-md mx-auto">Your waste collection pickups will appear here once your subscription is active.</p>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,77 @@
+<%# Notifications %>
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mb-6">
+    <%= link_to root_path, class: "inline-flex items-center text-sm text-gray-500 hover:text-emerald-600 transition-colors" do %>
+      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      Back to Dashboard
+    <% end %>
+  </div>
+
+  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+    <div>
+      <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Notifications</h1>
+      <p class="mt-1 text-gray-500">Stay updated on your pickups, wallet, and account</p>
+    </div>
+    <% if @notifications.any? { |n| !n.read? } %>
+      <%= button_to mark_all_read_notifications_path, method: :post, class: "inline-flex items-center px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors" do %>
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+        Mark All Read
+      <% end %>
+    <% end %>
+  </div>
+
+  <% if @notifications.present? %>
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      <div class="divide-y divide-gray-100">
+        <% @notifications.each do |notification| %>
+          <div class="flex items-start gap-4 p-5 sm:p-6 <%= 'bg-emerald-50/50' unless notification.read? %> hover:bg-gray-50 transition-colors">
+            <%# Unread indicator %>
+            <div class="flex-shrink-0 mt-1">
+              <% unless notification.read? %>
+                <span class="block w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+              <% else %>
+                <span class="block w-2.5 h-2.5 rounded-full bg-transparent"></span>
+              <% end %>
+            </div>
+
+            <%# Notification icon %>
+            <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-lg bg-emerald-100 text-emerald-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+            </div>
+
+            <%# Content %>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold text-gray-900 <%= 'font-bold' unless notification.read? %>">
+                <%= notification.title %>
+              </p>
+              <p class="text-sm text-gray-600 mt-1"><%= notification.body %></p>
+              <p class="text-xs text-gray-400 mt-2"><%= time_ago_in_words(notification.created_at) %> ago</p>
+            </div>
+
+            <%# Mark as read button %>
+            <% unless notification.read? %>
+              <div class="flex-shrink-0">
+                <%= button_to mark_read_notification_path(notification), method: :patch, class: "p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors", title: "Mark as read" do %>
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Pagination %>
+    <% if defined?(pagy) && @pagy %>
+      <div class="mt-6">
+        <%== pagy_nav(@pagy) %>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-12 text-center">
+      <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+      <h2 class="text-xl font-bold text-gray-900 mb-2">No Notifications</h2>
+      <p class="text-gray-500">You're all caught up! Notifications about pickups and account activity will appear here.</p>
+    </div>
+  <% end %>
+</div>
