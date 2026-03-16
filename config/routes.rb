@@ -39,6 +39,11 @@ Rails.application.routes.draw do
       patch :mark_all_read
     end
   end
+  resources :rewards, only: [:index] do
+    collection do
+      post :redeem
+    end
+  end
   get "waste_tracking", to: "waste_tracking#index"
   get "qr_code", to: "households#qr_code"
 
@@ -56,6 +61,7 @@ Rails.application.routes.draw do
     end
     get "scan", to: "scanner#index"
     post "scan/verify", to: "scanner#verify"
+    get "performance", to: "performance#index"
   end
 
   # Admin namespace
@@ -74,5 +80,6 @@ Rails.application.routes.draw do
     resources :subscription_plans
     resources :subscriptions, only: [:index, :show]
     get "revenue", to: "revenue#index"
+    get "waste_analytics", to: "waste_analytics#index"
   end
 end

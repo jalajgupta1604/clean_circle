@@ -1,5 +1,5 @@
 <%# Household Form Partial %>
-<%= form_with(model: household, class: "space-y-6") do |f| %>
+<%= form_with(model: household, url: household_path, class: "space-y-6") do |f| %>
   <% if household.errors.any? %>
     <div class="bg-red-50 border border-red-200 rounded-xl p-4">
       <div class="flex items-start">

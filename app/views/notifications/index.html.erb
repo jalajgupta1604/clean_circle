@@ -12,7 +12,7 @@
       <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Notifications</h1>
       <p class="mt-1 text-gray-500">Stay updated on your pickups, wallet, and account</p>
     </div>
-    <% if @notifications.any? { |n| !n.read? } %>
+    <% if @notifications.any? { |n| n.unread? } %>
       <%= button_to mark_all_read_notifications_path, method: :post, class: "inline-flex items-center px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors" do %>
         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
         Mark All Read
@@ -24,10 +24,10 @@
     <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
       <div class="divide-y divide-gray-100">
         <% @notifications.each do |notification| %>
-          <div class="flex items-start gap-4 p-5 sm:p-6 <%= 'bg-emerald-50/50' unless notification.read? %> hover:bg-gray-50 transition-colors">
+          <div class="flex items-start gap-4 p-5 sm:p-6 <%= 'bg-emerald-50/50' unless !notification.unread? %> hover:bg-gray-50 transition-colors">
             <%# Unread indicator %>
             <div class="flex-shrink-0 mt-1">
-              <% unless notification.read? %>
+              <% unless !notification.unread? %>
                 <span class="block w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
               <% else %>
                 <span class="block w-2.5 h-2.5 rounded-full bg-transparent"></span>
@@ -41,7 +41,7 @@
 
             <%# Content %>
             <div class="flex-1 min-w-0">
-              <p class="text-sm font-semibold text-gray-900 <%= 'font-bold' unless notification.read? %>">
+              <p class="text-sm font-semibold text-gray-900 <%= 'font-bold' unless !notification.unread? %>">
                 <%= notification.title %>
               </p>
               <p class="text-sm text-gray-600 mt-1"><%= notification.body %></p>
@@ -49,7 +49,7 @@
             </div>
 
             <%# Mark as read button %>
-            <% unless notification.read? %>
+            <% unless !notification.unread? %>
               <div class="flex-shrink-0">
                 <%= button_to mark_read_notification_path(notification), method: :patch, class: "p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors", title: "Mark as read" do %>
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>

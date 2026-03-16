@@ -10,6 +10,17 @@ module Agent
       @households = @route.households
                           .includes(:pickups)
                           .order(:building_name, :unit_number)
+
+      @household_map_data = @households.map do |household|
+        today_pickup = household.pickups.find_by(created_at: Date.current.all_day)
+        {
+          id: household.id,
+          address: household.address,
+          lat: household.latitude&.to_f,
+          lng: household.longitude&.to_f,
+          pickup_status: today_pickup&.status
+        }
+      end
     end
 
     private

@@ -10,13 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_13_125053) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_16_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "households", force: :cascade do |t|
     t.bigint "user_id", null: false
-    t.bigint "route_id", null: false
+    t.bigint "route_id"
     t.text "address"
     t.string "building_name"
     t.string "unit_number"
@@ -107,6 +107,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_13_125053) do
     t.string "uid"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "eco_score", default: 0, null: false
+    t.integer "reward_points", default: 0, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["phone"], name: "index_users_on_phone", unique: true
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true

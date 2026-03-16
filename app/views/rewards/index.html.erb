@@ -1,0 +1,206 @@
+<%# Rewards & Eco Score %>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+  <%# Page Header %>
+  <div class="mb-8">
+    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Rewards & Eco Score</h1>
+    <p class="mt-1 text-gray-500">Track your environmental impact and earn rewards for staying green.</p>
+  </div>
+
+  <%# Top Row: Eco Score + Points + Badge %>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+
+    <%# Eco Score Gauge %>
+    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm text-center">
+      <h2 class="text-sm font-medium text-gray-500 mb-4">Eco Score</h2>
+      <div class="relative inline-flex items-center justify-center w-36 h-36 mb-4">
+        <svg class="w-36 h-36 transform -rotate-90" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="52" stroke="#e5e7eb" stroke-width="10" fill="none"/>
+          <circle cx="60" cy="60" r="52" stroke="<%= @eco_score >= 76 ? '#059669' : @eco_score >= 51 ? '#10b981' : @eco_score >= 26 ? '#34d399' : '#6ee7b7' %>"
+                  stroke-width="10" fill="none"
+                  stroke-dasharray="<%= (2 * Math::PI * 52).round(1) %>"
+                  stroke-dashoffset="<%= ((1 - @eco_score / 100.0) * 2 * Math::PI * 52).round(1) %>"
+                  stroke-linecap="round"/>
+        </svg>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <span class="text-3xl font-bold text-gray-900"><%= @eco_score %></span>
+        </div>
+      </div>
+      <p class="text-xs text-gray-400">out of 100</p>
+    </div>
+
+    <%# Current Badge %>
+    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm text-center">
+      <h2 class="text-sm font-medium text-gray-500 mb-4">Current Badge</h2>
+      <div class="mb-4">
+        <% badge_colors = { "Beginner" => "bg-gray-100 text-gray-600", "Eco Warrior" => "bg-emerald-100 text-emerald-600", "Green Champion" => "bg-green-100 text-green-600", "Planet Saver" => "bg-teal-100 text-teal-700" } %>
+        <% badge_icons = { "Beginner" => "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253", "Eco Warrior" => "M13 10V3L4 14h7v7l9-11h-7z", "Green Champion" => "M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z", "Planet Saver" => "M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" } %>
+        <div class="w-20 h-20 mx-auto flex items-center justify-center rounded-full <%= badge_colors[@eco_badge] %>">
+          <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="<%= badge_icons[@eco_badge] %>"/>
+          </svg>
+        </div>
+      </div>
+      <p class="text-xl font-bold text-gray-900"><%= @eco_badge %></p>
+      <p class="text-xs text-gray-400 mt-1">
+        <% case @eco_badge
+           when "Beginner" %>Keep completing pickups to level up!
+        <% when "Eco Warrior" %>Great progress! You're making a difference.
+        <% when "Green Champion" %>Amazing! You're leading the way.
+        <% when "Planet Saver" %>Outstanding! You're a true eco hero!
+        <% end %>
+      </p>
+    </div>
+
+    <%# Reward Points & Redeem %>
+    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm text-center">
+      <h2 class="text-sm font-medium text-gray-500 mb-4">Reward Points</h2>
+      <div class="mb-4">
+        <div class="w-20 h-20 mx-auto flex items-center justify-center rounded-full bg-amber-100 text-amber-600">
+          <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+      </div>
+      <p class="text-3xl font-bold text-gray-900"><%= @reward_points %></p>
+      <p class="text-xs text-gray-400 mb-4">points available</p>
+
+      <% if @reward_points >= 100 %>
+        <%= form_with url: redeem_rewards_path, method: :post, class: "space-y-3" do |f| %>
+          <div class="flex items-center gap-2">
+            <select name="amount" class="flex-1 rounded-lg border-gray-300 text-sm focus:ring-emerald-500 focus:border-emerald-500">
+              <% [100, 200, 500, 1000].each do |pts| %>
+                <% next if pts > @reward_points %>
+                <option value="<%= pts %>"><%= pts %> pts = &#8377;<%= (pts / 100.0 * 10).round(0) %></option>
+              <% end %>
+            </select>
+            <%= f.submit "Redeem", class: "px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors cursor-pointer" %>
+          </div>
+        <% end %>
+      <% else %>
+        <p class="text-xs text-gray-400">Earn <%= 100 - @reward_points %> more points to redeem.</p>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Badge Progression %>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-8">
+    <h2 class="text-lg font-bold text-gray-900 mb-6">Badge Progression</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <% badges = [
+        { name: "Beginner", range: "0-25", icon: "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253", color_active: "bg-gray-600 text-white", color_inactive: "bg-gray-100 text-gray-400" },
+        { name: "Eco Warrior", range: "26-50", icon: "M13 10V3L4 14h7v7l9-11h-7z", color_active: "bg-emerald-600 text-white", color_inactive: "bg-emerald-50 text-emerald-300" },
+        { name: "Green Champion", range: "51-75", icon: "M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z", color_active: "bg-green-600 text-white", color_inactive: "bg-green-50 text-green-300" },
+        { name: "Planet Saver", range: "76-100", icon: "M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z", color_active: "bg-teal-600 text-white", color_inactive: "bg-teal-50 text-teal-300" }
+      ] %>
+      <% badges.each do |badge| %>
+        <% is_current = @eco_badge == badge[:name] %>
+        <div class="text-center p-4 rounded-xl border-2 <%= is_current ? 'border-emerald-500 bg-emerald-50' : 'border-gray-100' %>">
+          <div class="w-14 h-14 mx-auto flex items-center justify-center rounded-full mb-3 <%= is_current ? badge[:color_active] : badge[:color_inactive] %>">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="<%= badge[:icon] %>"/>
+            </svg>
+          </div>
+          <p class="font-semibold text-sm <%= is_current ? 'text-emerald-700' : 'text-gray-500' %>"><%= badge[:name] %></p>
+          <p class="text-xs text-gray-400">Score: <%= badge[:range] %></p>
+          <% if is_current %>
+            <span class="inline-block mt-2 px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-600 text-white">Current</span>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+    <%# Points History %>
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
+      <div class="p-6 border-b border-gray-100">
+        <h2 class="text-lg font-bold text-gray-900">Points History</h2>
+      </div>
+      <% if @reward_notifications.present? %>
+        <div class="divide-y divide-gray-100 max-h-96 overflow-y-auto">
+          <% @reward_notifications.each do |notification| %>
+            <div class="flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors">
+              <div class="w-10 h-10 flex items-center justify-center rounded-full bg-amber-100 text-amber-600 shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="font-medium text-gray-900 text-sm"><%= notification.title %></p>
+                <p class="text-xs text-gray-500 truncate"><%= notification.body %></p>
+              </div>
+              <span class="text-xs text-gray-400 whitespace-nowrap"><%= time_ago_in_words(notification.created_at) %> ago</span>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="p-12 text-center">
+          <svg class="w-12 h-12 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <p class="text-gray-500">No points earned yet. Complete pickups to start earning!</p>
+        </div>
+      <% end %>
+    </div>
+
+    <%# Tips to Earn More %>
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
+      <div class="p-6 border-b border-gray-100">
+        <h2 class="text-lg font-bold text-gray-900">Tips to Earn More Points</h2>
+      </div>
+      <div class="p-6 space-y-4">
+        <div class="flex items-start gap-3">
+          <div class="w-8 h-8 flex items-center justify-center rounded-lg bg-emerald-100 text-emerald-600 shrink-0 mt-0.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          </div>
+          <div>
+            <p class="font-medium text-gray-900 text-sm">Never miss a pickup</p>
+            <p class="text-xs text-gray-500">Consistent pickups boost your eco score and earn 10 points each.</p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3">
+          <div class="w-8 h-8 flex items-center justify-center rounded-lg bg-emerald-100 text-emerald-600 shrink-0 mt-0.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+          </div>
+          <div>
+            <p class="font-medium text-gray-900 text-sm">Reduce your waste</p>
+            <p class="text-xs text-gray-500">Lowering waste volume month-over-month increases your eco score significantly.</p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3">
+          <div class="w-8 h-8 flex items-center justify-center rounded-lg bg-emerald-100 text-emerald-600 shrink-0 mt-0.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          </div>
+          <div>
+            <p class="font-medium text-gray-900 text-sm">Stay on schedule</p>
+            <p class="text-xs text-gray-500">Regular scheduled pickups earn 10 points vs 5 for on-demand.</p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3">
+          <div class="w-8 h-8 flex items-center justify-center rounded-lg bg-emerald-100 text-emerald-600 shrink-0 mt-0.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V7m0 10v1"/></svg>
+          </div>
+          <div>
+            <p class="font-medium text-gray-900 text-sm">Redeem for wallet credit</p>
+            <p class="text-xs text-gray-500">Every 100 points = &#8377;10 wallet credit. Keep earning and saving!</p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3">
+          <div class="w-8 h-8 flex items-center justify-center rounded-lg bg-emerald-100 text-emerald-600 shrink-0 mt-0.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+          </div>
+          <div>
+            <p class="font-medium text-gray-900 text-sm">Level up your badge</p>
+            <p class="text-xs text-gray-500">Aim for Planet Saver (76+) -- the highest eco badge for top contributors!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

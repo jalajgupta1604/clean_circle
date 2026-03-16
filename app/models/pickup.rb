@@ -27,6 +27,7 @@ class Pickup < ApplicationRecord
   scope :scheduled, -> { where(status: :scheduled) }
 
   after_update :deduct_wallet_on_completion
+  after_update :award_reward_points, if: :saved_change_to_status?
   after_create :send_scheduled_notification
   after_update :send_completion_notification, if: :saved_change_to_status?
   after_update :send_missed_notification, if: :saved_change_to_status?
@@ -98,5 +99,14 @@ class Pickup < ApplicationRecord
       body: "Your scheduled pickup was missed. We apologize for the inconvenience.",
       notification_type: :pickup_missed
     )
+  end
+
+  def award_reward_points
+    return unless completed?
+
+    points = regular? ? 10 : 5
+    reason = regular? ? "Regular pickup completed" : "On-demand pickup completed"
+    household.user.award_points!(points, reason)
+    household.user.calculate_eco_score!
   end
 end

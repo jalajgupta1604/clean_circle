@@ -10,5 +10,8 @@ class DashboardController < ApplicationController
                        &.where(confirmed_at: Time.current.all_month)
                        &.sum(:estimated_volume) || 0
     @recent_pickups = @household&.pickups&.order(created_at: :desc)&.limit(5) || []
+    @eco_score = current_user.eco_score
+    @eco_badge = current_user.eco_badge
+    @reward_points = current_user.reward_points
   end
 end

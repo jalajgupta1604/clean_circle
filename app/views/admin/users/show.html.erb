@@ -63,22 +63,23 @@
       <!-- Wallet -->
       <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 p-6">
         <h3 class="text-lg font-semibold text-gray-900 mb-3">Wallet</h3>
-        <p class="text-3xl font-bold text-indigo-600"><%= number_to_currency(@user.wallet_balance || 0) %></p>
+        <p class="text-3xl font-bold text-indigo-600"><%= number_to_currency(@user.wallet&.balance || 0) %></p>
         <p class="text-sm text-gray-500 mt-1">Current Balance</p>
       </div>
 
       <!-- Subscription -->
       <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 p-6">
         <h3 class="text-lg font-semibold text-gray-900 mb-3">Subscription</h3>
-        <% if @user.subscription.present? %>
-          <p class="text-sm font-medium text-gray-900"><%= @user.subscription.plan&.name %></p>
+        <% sub = @user.active_subscription %>
+        <% if sub.present? %>
+          <p class="text-sm font-medium text-gray-900"><%= sub.subscription_plan&.name %></p>
           <p class="text-sm text-gray-500 mt-1">Status:
-            <span class="font-medium <%= @user.subscription.active? ? 'text-green-600' : 'text-red-600' %>">
-              <%= @user.subscription.status&.capitalize %>
+            <span class="font-medium <%= sub.active? ? 'text-green-600' : 'text-red-600' %>">
+              <%= sub.status&.capitalize %>
             </span>
           </p>
-          <p class="text-sm text-gray-500 mt-1">Expires: <%= @user.subscription.expires_at&.strftime("%b %d, %Y") %></p>
-          <%= link_to "View Subscription", admin_subscription_path(@user.subscription), class: "mt-3 inline-block text-sm text-indigo-600 hover:text-indigo-800 font-medium" %>
+          <p class="text-sm text-gray-500 mt-1">Expires: <%= sub.ends_on&.strftime("%b %d, %Y") %></p>
+          <%= link_to "View Subscription", admin_subscription_path(sub), class: "mt-3 inline-block text-sm text-indigo-600 hover:text-indigo-800 font-medium" %>
         <% else %>
           <p class="text-sm text-gray-500">No active subscription</p>
         <% end %>
