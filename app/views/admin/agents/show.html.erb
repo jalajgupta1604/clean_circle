@@ -8,6 +8,17 @@
       <% end %>
       <h2 class="text-2xl font-bold text-gray-900"><%= @agent.name %></h2>
       <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">Agent</span>
+      <% if @agent_active %>
+        <span class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800">
+          <span class="mr-1.5 h-2 w-2 rounded-full bg-emerald-500"></span>
+          Active
+        </span>
+      <% else %>
+        <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600">
+          <span class="mr-1.5 h-2 w-2 rounded-full bg-gray-400"></span>
+          Inactive
+        </span>
+      <% end %>
     </div>
   </div>
 
@@ -50,6 +61,49 @@
         <p class="mt-2 text-3xl font-bold text-gray-900"><%= @agent.pickups.count %></p>
       </div>
     </div>
+  </div>
+
+  <!-- Performance Summary (This Month) -->
+  <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 p-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Performance Summary (This Month)</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+      <div class="text-center p-4 rounded-lg bg-indigo-50">
+        <p class="text-sm font-medium text-gray-500">Completion Rate</p>
+        <p class="mt-1 text-3xl font-bold text-indigo-600"><%= @month_completion_rate %>%</p>
+      </div>
+      <div class="text-center p-4 rounded-lg bg-green-50">
+        <p class="text-sm font-medium text-gray-500">Completed Pickups</p>
+        <p class="mt-1 text-3xl font-bold text-green-600"><%= @month_completed %></p>
+      </div>
+      <div class="text-center p-4 rounded-lg bg-red-50">
+        <p class="text-sm font-medium text-gray-500">Missed Pickups</p>
+        <p class="mt-1 text-3xl font-bold text-red-600"><%= @month_missed %></p>
+      </div>
+      <div class="text-center p-4 rounded-lg bg-purple-50">
+        <p class="text-sm font-medium text-gray-500">Total Pickups</p>
+        <p class="mt-1 text-3xl font-bold text-purple-600"><%= @month_total_pickups %></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assign Route -->
+  <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 p-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Assign Route</h3>
+    <% if @available_routes.any? %>
+      <%= form_with url: assign_route_admin_agent_path(@agent), method: :post, class: "flex items-end space-x-3" do |f| %>
+        <div class="flex-1">
+          <label for="route_id" class="block text-xs font-medium text-gray-500 mb-1">Select Route</label>
+          <select name="route_id" id="route_id" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+            <% @available_routes.each do |route| %>
+              <option value="<%= route.id %>"><%= route.name %> - <%= route.area %> (<%= route.agent_id.present? ? route.agent&.name : 'Unassigned' %>)</option>
+            <% end %>
+          </select>
+        </div>
+        <%= f.submit "Assign Route", class: "inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 cursor-pointer" %>
+      <% end %>
+    <% else %>
+      <p class="text-sm text-gray-500">All routes are already assigned to this agent.</p>
+    <% end %>
   </div>
 
   <!-- Assigned Routes -->

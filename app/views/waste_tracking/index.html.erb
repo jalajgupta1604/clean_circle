@@ -12,6 +12,123 @@
     <p class="mt-1 text-gray-500">Monitor your waste generation and environmental impact over time</p>
   </div>
 
+  <%# Eco Score & Monthly Comparison %>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <%# Eco Score Badge %>
+    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm flex items-center gap-6">
+      <div class="relative flex-shrink-0">
+        <div class="w-20 h-20 flex items-center justify-center rounded-full
+          <%= case current_user.eco_badge
+              when 'Planet Saver' then 'bg-teal-100 text-teal-700'
+              when 'Green Champion' then 'bg-green-100 text-green-700'
+              when 'Eco Warrior' then 'bg-emerald-100 text-emerald-700'
+              else 'bg-gray-100 text-gray-600'
+              end %>">
+          <span class="text-2xl font-bold"><%= current_user.eco_score %></span>
+        </div>
+      </div>
+      <div>
+        <h3 class="text-lg font-bold text-gray-900">Eco Score</h3>
+        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold mt-1
+          <%= case current_user.eco_badge
+              when 'Planet Saver' then 'bg-teal-100 text-teal-700'
+              when 'Green Champion' then 'bg-green-100 text-green-700'
+              when 'Eco Warrior' then 'bg-emerald-100 text-emerald-700'
+              else 'bg-gray-100 text-gray-600'
+              end %>">
+          <%= current_user.eco_badge %>
+        </span>
+        <p class="text-sm text-gray-500 mt-2">Keep reducing waste to improve your score!</p>
+      </div>
+    </div>
+
+    <%# Monthly Comparison %>
+    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+      <h3 class="text-sm font-medium text-gray-500 mb-3">Monthly Comparison</h3>
+      <div class="flex items-end justify-between">
+        <div>
+          <p class="text-xs text-gray-400 mb-1">Last Month</p>
+          <p class="text-2xl font-bold text-gray-900"><%= @last_month_waste %> <span class="text-sm font-normal text-gray-500">L</span></p>
+        </div>
+        <div class="flex items-center mx-4">
+          <% if @last_month_waste > 0 && @this_month_waste < @last_month_waste %>
+            <div class="flex items-center text-green-600">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+              <span class="text-sm font-semibold ml-1"><%= (( (@last_month_waste - @this_month_waste) / @last_month_waste.to_f) * 100).round(0) %>% down</span>
+            </div>
+          <% elsif @last_month_waste > 0 && @this_month_waste > @last_month_waste %>
+            <div class="flex items-center text-red-600">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/></svg>
+              <span class="text-sm font-semibold ml-1"><%= (( (@this_month_waste - @last_month_waste) / @last_month_waste.to_f) * 100).round(0) %>% up</span>
+            </div>
+          <% else %>
+            <span class="text-sm text-gray-400">--</span>
+          <% end %>
+        </div>
+        <div class="text-right">
+          <p class="text-xs text-gray-400 mb-1">This Month</p>
+          <p class="text-2xl font-bold text-gray-900"><%= @this_month_waste %> <span class="text-sm font-normal text-gray-500">L</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# Waste Reduction Goal Progress Bar %>
+  <% first_month_waste = @monthly_data.values.find { |v| v > 0 } || 0
+     target_waste = (first_month_waste * 0.9).round(1)
+     progress = if first_month_waste > 0 && @this_month_waste <= target_waste
+                  100
+                elsif first_month_waste > 0 && @this_month_waste < first_month_waste
+                  (((first_month_waste - @this_month_waste) / (first_month_waste * 0.1).to_f) * 100).clamp(0, 100).round(0)
+                else
+                  0
+                end %>
+  <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm mb-8">
+    <div class="flex items-center justify-between mb-2">
+      <h3 class="text-sm font-bold text-gray-900">Waste Reduction Goal</h3>
+      <span class="text-sm text-gray-500">Target: reduce 10% from first month (<%= target_waste %> L)</span>
+    </div>
+    <div class="w-full bg-gray-200 rounded-full h-3">
+      <div class="bg-emerald-500 h-3 rounded-full transition-all duration-500" style="width: <%= progress %>%"></div>
+    </div>
+    <p class="text-xs text-gray-500 mt-2"><%= progress %>% towards your reduction goal</p>
+  </div>
+
+  <%# Sustainability Milestone Badges %>
+  <% milestones = [
+       { name: "First Pickup", threshold: 1, icon: "M5 13l4 4L19 7" },
+       { name: "10 Pickups", threshold: 10, icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" },
+       { name: "50 Pickups", threshold: 50, icon: "M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" },
+       { name: "100L Diverted", threshold: 100, icon: "M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" }
+     ] %>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-8">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-lg font-bold text-gray-900">Sustainability Milestones</h2>
+      <%= link_to rewards_path, class: "inline-flex items-center text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-colors" do %>
+        View Rewards
+        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      <% end %>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <% milestones.each do |milestone| %>
+        <% earned = milestone[:name] == "100L Diverted" ? @total_waste >= milestone[:threshold] : @total_pickups_count >= milestone[:threshold] %>
+        <div class="text-center p-4 rounded-xl border-2 <%= earned ? 'border-emerald-200 bg-emerald-50' : 'border-gray-100 bg-gray-50' %>">
+          <div class="w-12 h-12 mx-auto flex items-center justify-center rounded-full mb-3 <%= earned ? 'bg-emerald-600 text-white' : 'bg-gray-200 text-gray-400' %>">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<%= milestone[:icon] %>"/>
+            </svg>
+          </div>
+          <p class="font-semibold text-sm <%= earned ? 'text-emerald-700' : 'text-gray-400' %>"><%= milestone[:name] %></p>
+          <% if earned %>
+            <span class="inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-600 text-white">Earned</span>
+          <% else %>
+            <span class="inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-200 text-gray-500">Locked</span>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
   <%# Stats Summary Cards %>
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
     <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">

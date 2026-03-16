@@ -86,6 +86,46 @@
     </div>
   </div>
 
+  <!-- Waste by Bucket Size & Environmental Impact -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Waste by Bucket Size -->
+    <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Waste by Bucket Size</h3>
+      <% if @waste_by_bucket.any? %>
+        <%= bar_chart @waste_by_bucket, colors: ["#8b5cf6"], suffix: " L", library: { scales: { y: { beginAtZero: true } } } %>
+      <% else %>
+        <p class="text-sm text-gray-500 text-center py-8">No bucket size data available yet.</p>
+      <% end %>
+    </div>
+
+    <!-- Environmental Impact Summary -->
+    <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Environmental Impact</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="text-center p-6 rounded-lg bg-green-50 border border-green-200">
+          <div class="flex-shrink-0 mx-auto rounded-full bg-green-100 p-3 w-12 h-12 flex items-center justify-center mb-3">
+            <svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <p class="text-sm font-medium text-gray-500">Estimated CO2 Saved</p>
+          <p class="mt-1 text-3xl font-bold text-green-700"><%= number_with_delimiter(@environmental_impact[:co2_saved]) %> kg</p>
+          <p class="mt-1 text-xs text-gray-400">Based on 5kg CO2 saved per 1,000L of waste managed</p>
+        </div>
+        <div class="text-center p-6 rounded-lg bg-emerald-50 border border-emerald-200">
+          <div class="flex-shrink-0 mx-auto rounded-full bg-emerald-100 p-3 w-12 h-12 flex items-center justify-center mb-3">
+            <svg class="h-6 w-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+            </svg>
+          </div>
+          <p class="text-sm font-medium text-gray-500">Equivalent Trees Planted</p>
+          <p class="mt-1 text-3xl font-bold text-emerald-700"><%= number_with_delimiter(@environmental_impact[:trees_equivalent]) %></p>
+          <p class="mt-1 text-xs text-gray-400">Based on 100kg CO2 absorption per tree per year</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Waste by Route Table -->
   <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 overflow-hidden">
     <div class="px-6 py-4 border-b border-gray-200">

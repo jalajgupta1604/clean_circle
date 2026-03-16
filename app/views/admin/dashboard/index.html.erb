@@ -5,7 +5,7 @@
   </div>
 
   <!-- Stats Cards -->
-  <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+  <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
     <div class="overflow-hidden rounded-xl bg-white shadow ring-1 ring-gray-200 p-5">
       <div class="flex items-center">
         <div class="flex-shrink-0 rounded-lg bg-indigo-100 p-3">
@@ -86,6 +86,20 @@
         <div class="ml-4">
           <p class="text-sm font-medium text-gray-500">Revenue (Month)</p>
           <p class="text-2xl font-bold text-gray-900"><%= number_to_currency(@monthly_revenue) %></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="overflow-hidden rounded-xl bg-white shadow ring-1 ring-gray-200 p-5">
+      <div class="flex items-center">
+        <div class="flex-shrink-0 rounded-lg bg-emerald-100 p-3">
+          <svg class="h-6 w-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-500">Waste Collected</p>
+          <p class="text-2xl font-bold text-gray-900"><%= number_with_delimiter(@total_waste_collected.to_f.round(1)) %> L</p>
         </div>
       </div>
     </div>

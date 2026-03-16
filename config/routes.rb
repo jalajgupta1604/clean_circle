@@ -68,9 +68,17 @@ Rails.application.routes.draw do
   namespace :admin do
     get "/", to: "dashboard#index"
     resources :users
-    resources :agents, only: [:index, :show, :edit, :update]
+    resources :agents, only: [:index, :show, :edit, :update] do
+      member do
+        post :assign_route
+      end
+    end
     resources :routes
-    resources :households, only: [:index, :show]
+    resources :households, only: [:index, :show] do
+      member do
+        post :adjust_wallet
+      end
+    end
     resources :pickups, only: [:index, :show, :new, :create] do
       collection do
         get :schedule

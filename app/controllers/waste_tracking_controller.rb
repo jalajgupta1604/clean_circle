@@ -15,6 +15,12 @@ class WasteTrackingController < ApplicationController
     @total_pickups = completed_pickups.count
     @avg_per_pickup = @total_pickups > 0 ? (@total_waste / @total_pickups).round(1) : 0
 
+    @total_pickups_count = @total_pickups
+
+    # Monthly comparison data
+    @this_month_waste = completed_pickups.where(confirmed_at: Time.current.all_month).sum(:estimated_volume).round(1)
+    @last_month_waste = completed_pickups.where(confirmed_at: 1.month.ago.all_month).sum(:estimated_volume).round(1)
+
     # Build monthly data hash for chartkick
     @monthly_data = {}
     (0..11).each do |months_ago|

@@ -13,6 +13,8 @@ module Admin
                                           .where(created_at: Date.current.all_month)
                                           .sum(:amount)
 
+      @total_waste_collected = Pickup.completed.sum(:estimated_volume)
+
       # Pickup trend for chart (last 30 days)
       @pickup_trend = {}
       (29.downto(0)).each do |days_ago|

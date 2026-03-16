@@ -79,6 +79,89 @@
     </div>
   </div>
 
+  <!-- Subscription & Wallet Management -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Change Plan Section -->
+    <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Subscription Plan</h3>
+      <% if @subscription.present? %>
+        <dl class="space-y-3 mb-4">
+          <div>
+            <dt class="text-sm font-medium text-gray-500">Current Plan</dt>
+            <dd class="mt-1 text-sm text-gray-900 font-semibold"><%= @subscription.subscription_plan.name %> (<%= @subscription.subscription_plan.bucket_size %>L)</dd>
+          </div>
+          <div>
+            <dt class="text-sm font-medium text-gray-500">Status</dt>
+            <dd class="mt-1">
+              <% sub_status_classes = { "active" => "bg-green-100 text-green-800", "paused" => "bg-yellow-100 text-yellow-800", "cancelled" => "bg-red-100 text-red-800", "expired" => "bg-gray-100 text-gray-800" } %>
+              <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium <%= sub_status_classes[@subscription.status] || 'bg-gray-100 text-gray-800' %>">
+                <%= @subscription.status.humanize %>
+              </span>
+            </dd>
+          </div>
+          <div>
+            <dt class="text-sm font-medium text-gray-500">End Date</dt>
+            <dd class="mt-1 text-sm text-gray-900"><%= @subscription.ends_on.strftime("%B %d, %Y") %></dd>
+          </div>
+          <div>
+            <dt class="text-sm font-medium text-gray-500">Days Remaining</dt>
+            <dd class="mt-1 text-sm text-gray-900"><%= @subscription.days_remaining %> days</dd>
+          </div>
+        </dl>
+        <div class="border-t border-gray-200 pt-4">
+          <p class="text-sm font-medium text-gray-700 mb-2">Change Plan</p>
+          <%= form_with url: admin_subscription_path(@subscription), method: :patch, class: "flex items-end space-x-3" do |f| %>
+            <div class="flex-1">
+              <label for="subscription_plan_id" class="block text-xs font-medium text-gray-500 mb-1">New Plan</label>
+              <select name="subscription[subscription_plan_id]" id="subscription_plan_id" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+                <% @subscription_plans.each do |plan| %>
+                  <option value="<%= plan.id %>" <%= 'selected' if plan.id == @subscription.subscription_plan_id %>><%= plan.name %> - <%= number_to_currency(plan.price) %> (<%= plan.bucket_size %>L)</option>
+                <% end %>
+              </select>
+            </div>
+            <%= f.submit "Change Plan", class: "inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 cursor-pointer" %>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-sm text-gray-500">No active subscription</p>
+      <% end %>
+    </div>
+
+    <!-- Adjust Wallet Section -->
+    <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Wallet</h3>
+      <% if @wallet.present? %>
+        <div class="mb-4">
+          <p class="text-sm font-medium text-gray-500">Current Balance</p>
+          <p class="text-3xl font-bold text-indigo-600 mt-1"><%= number_to_currency(@wallet.balance) %></p>
+        </div>
+        <div class="border-t border-gray-200 pt-4">
+          <p class="text-sm font-medium text-gray-700 mb-2">Adjust Wallet</p>
+          <%= form_with url: adjust_wallet_admin_household_path(@household), method: :post, class: "space-y-3" do |f| %>
+            <div>
+              <label for="amount" class="block text-xs font-medium text-gray-500 mb-1">Amount</label>
+              <input type="number" name="amount" id="amount" step="0.01" min="0.01" required class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm" placeholder="0.00">
+            </div>
+            <div>
+              <label for="transaction_type" class="block text-xs font-medium text-gray-500 mb-1">Type</label>
+              <select name="transaction_type" id="transaction_type" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+                <option value="credit">Credit (Add funds)</option>
+                <option value="debit">Debit (Deduct funds)</option>
+              </select>
+            </div>
+            <div>
+              <label for="description" class="block text-xs font-medium text-gray-500 mb-1">Description</label>
+              <input type="text" name="description" id="description" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm" placeholder="Admin adjustment">
+            </div>
+            <%= f.submit "Submit Adjustment", class: "w-full inline-flex justify-center items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 cursor-pointer" %>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-sm text-gray-500">No wallet found for this household</p>
+      <% end %>
+    </div>
+  </div>
+
   <!-- Pickups History -->
   <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 overflow-hidden">
     <div class="px-6 py-4 border-b border-gray-200">

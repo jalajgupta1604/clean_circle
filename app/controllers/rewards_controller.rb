@@ -8,6 +8,7 @@ class RewardsController < ApplicationController
     @reward_points = current_user.reward_points
     @wallet_balance = current_user.wallet&.balance || 0
     @reward_notifications = current_user.notifications.where(notification_type: :reward).order(created_at: :desc).limit(20)
+    @total_pickups = current_user.household&.pickups&.completed&.count || 0
   end
 
   def redeem

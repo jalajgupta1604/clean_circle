@@ -24,6 +24,19 @@
     </span>
   </div>
 
+  <%# Verified Collection Badge %>
+  <% if @pickup.completed? %>
+    <div class="bg-green-50 border border-green-200 rounded-xl p-4 mb-6 flex items-center gap-3">
+      <div class="w-10 h-10 flex items-center justify-center rounded-full bg-green-600 text-white flex-shrink-0">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+      </div>
+      <div>
+        <p class="font-bold text-green-800">Verified Collection</p>
+        <p class="text-sm text-green-600">This pickup has been verified and completed successfully.</p>
+      </div>
+    </div>
+  <% end %>
+
   <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
     <div class="divide-y divide-gray-100">
       <%# Status %>
@@ -37,16 +50,30 @@
         <span class="font-semibold text-gray-900"><%= @pickup.status.titleize %></span>
       </div>
 
-      <%# Agent Name %>
+      <%# Collected By Agent %>
       <div class="flex items-center justify-between p-5 sm:p-6">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-blue-100 text-blue-600">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
           </div>
-          <span class="text-sm font-medium text-gray-500">Collection Agent</span>
+          <span class="text-sm font-medium text-gray-500"><%= @pickup.completed? ? "Collected by" : "Collection Agent" %></span>
         </div>
         <span class="font-semibold text-gray-900"><%= @pickup.agent&.name || "Not assigned" %></span>
       </div>
+
+      <%# Bucket Size from Subscription Plan %>
+      <% plan = @pickup.household&.user&.active_subscription&.subscription_plan %>
+      <% if plan %>
+        <div class="flex items-center justify-between p-5 sm:p-6">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-indigo-100 text-indigo-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+            </div>
+            <span class="text-sm font-medium text-gray-500">Bucket Size (<%= plan.name %>)</span>
+          </div>
+          <span class="font-semibold text-gray-900"><%= plan.bucket_size %> L</span>
+        </div>
+      <% end %>
 
       <%# Timestamp %>
       <div class="flex items-center justify-between p-5 sm:p-6">
@@ -103,7 +130,13 @@
             <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-red-100 text-red-600">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             </div>
-            <span class="text-sm font-medium text-gray-500">GPS Location</span>
+            <div>
+              <span class="text-sm font-medium text-gray-500">GPS Location</span>
+              <span class="inline-flex items-center ml-2 px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                GPS Verified
+              </span>
+            </div>
           </div>
           <span class="font-semibold text-gray-900 text-sm"><%= @pickup.latitude %>, <%= @pickup.longitude %></span>
         </div>

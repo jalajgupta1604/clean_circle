@@ -57,11 +57,51 @@
       </div>
     </div>
 
+      <%# Auto Recharge Card %>
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-lg font-bold text-gray-900">Auto Recharge</h2>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="auto_recharge_toggle" class="sr-only peer">
+            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+          </label>
+        </div>
+        <p class="text-sm text-gray-500 mb-4">Automatically recharge your wallet when balance drops below a threshold.</p>
+
+        <div class="space-y-4" id="auto_recharge_fields">
+          <div>
+            <label for="auto_recharge_threshold" class="block text-sm font-medium text-gray-700 mb-1">When balance falls below</label>
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-medium">&#8377;</span>
+              <input type="number" id="auto_recharge_threshold" value="50" min="10" step="10"
+                     class="block w-full pl-8 pr-4 py-2.5 rounded-xl border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-gray-900 sm:text-sm">
+            </div>
+          </div>
+
+          <div>
+            <label for="auto_recharge_amount" class="block text-sm font-medium text-gray-700 mb-1">Recharge amount</label>
+            <select id="auto_recharge_amount" class="block w-full rounded-xl border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-gray-900 sm:text-sm py-2.5">
+              <option value="200">&#8377;200</option>
+              <option value="500" selected>&#8377;500</option>
+              <option value="1000">&#8377;1,000</option>
+              <option value="2000">&#8377;2,000</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <%# Right Column: Transaction History %>
     <div class="lg:col-span-2">
       <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
         <div class="p-6 border-b border-gray-100">
-          <h2 class="text-lg font-bold text-gray-900">Transaction History</h2>
+          <h2 class="text-lg font-bold text-gray-900 mb-4">Transaction History</h2>
+          <%# Transaction Type Filter Buttons %>
+          <div class="flex items-center gap-2">
+            <%= link_to "All", wallet_path, class: "px-4 py-1.5 rounded-full text-sm font-semibold transition-colors #{params[:type].blank? ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}" %>
+            <%= link_to "Credits", wallet_path(type: "credit"), class: "px-4 py-1.5 rounded-full text-sm font-semibold transition-colors #{params[:type] == 'credit' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}" %>
+            <%= link_to "Debits", wallet_path(type: "debit"), class: "px-4 py-1.5 rounded-full text-sm font-semibold transition-colors #{params[:type] == 'debit' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}" %>
+          </div>
         </div>
 
         <% if @transactions.present? %>

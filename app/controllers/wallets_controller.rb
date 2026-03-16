@@ -3,7 +3,9 @@ class WalletsController < ApplicationController
 
   def show
     @wallet = current_user.wallet || current_user.create_wallet(balance: 0)
-    @pagy, @transactions = pagy(@wallet.wallet_transactions.order(created_at: :desc), items: 15)
+    transactions = @wallet.wallet_transactions.order(created_at: :desc)
+    transactions = transactions.where(transaction_type: params[:type]) if params[:type].present?
+    @pagy, @transactions = pagy(transactions, items: 15)
   end
 
   def recharge

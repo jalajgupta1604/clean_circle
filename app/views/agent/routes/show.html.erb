@@ -21,6 +21,61 @@
   </div>
 </div>
 
+<%# Next Pickup highlight card %>
+<% next_household = @households.detect { |h| p = h.pickups.find_by(created_at: Date.current.all_day); p && p.status.in?(%w[scheduled in_progress]) } %>
+<% if next_household %>
+  <% next_pickup = next_household.pickups.find_by(created_at: Date.current.all_day) %>
+  <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">Next Pickup</p>
+        <p class="text-base font-bold text-gray-900"><%= next_household.address %></p>
+        <p class="text-sm text-gray-600">
+          <% if next_household.building_name.present? %><%= next_household.building_name %><% end %>
+          <% if next_household.unit_number.present? %> Unit <%= next_household.unit_number %><% end %>
+        </p>
+      </div>
+      <%= link_to agent_pickup_path(next_pickup),
+        class: "flex-shrink-0 ml-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-lg shadow-sm transition inline-flex items-center" do %>
+        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        Go to Pickup
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<%# Estimated completion info %>
+<% all_today = @households.map { |h| h.pickups.find_by(created_at: Date.current.all_day) }.compact %>
+<% completed_count = all_today.count { |p| p.status == "completed" } %>
+<% remaining_count = all_today.count { |p| p.status.in?(%w[scheduled in_progress]) } %>
+<% total_count = all_today.size %>
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-4 px-4 py-3">
+  <div class="flex items-center justify-between">
+    <div class="flex items-center space-x-4">
+      <div class="text-center">
+        <p class="text-xl font-bold text-green-600"><%= completed_count %></p>
+        <p class="text-xs text-gray-500">Completed</p>
+      </div>
+      <div class="text-center">
+        <p class="text-xl font-bold text-blue-600"><%= remaining_count %></p>
+        <p class="text-xs text-gray-500">Remaining</p>
+      </div>
+      <div class="text-center">
+        <p class="text-xl font-bold text-gray-700"><%= total_count %></p>
+        <p class="text-xs text-gray-500">Total</p>
+      </div>
+    </div>
+    <div class="text-sm text-gray-600 font-medium">
+      <%= completed_count %> of <%= total_count %> completed, <%= remaining_count %> remaining
+    </div>
+  </div>
+  <% if total_count > 0 %>
+    <div class="mt-2 w-full bg-gray-200 rounded-full h-2">
+      <div class="h-2 rounded-full bg-green-500" style="width: <%= ((completed_count.to_f / total_count) * 100).round %>%"></div>
+    </div>
+  <% end %>
+</div>
+
 <%# Route Map %>
 <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-4">
   <div class="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
@@ -49,37 +104,49 @@
   <% if @households.any? %>
     <ul class="divide-y divide-gray-100">
       <% @households.each do |household| %>
-        <li class="px-4 py-3">
-          <div class="flex items-center justify-between">
-            <div class="min-w-0 flex-1">
-              <p class="text-sm font-medium text-gray-900 truncate"><%= household.address %></p>
-              <p class="text-xs text-gray-500 mt-0.5">
-                <% if household.building_name.present? %>
-                  <%= household.building_name %>
-                <% end %>
-                <% if household.unit_number.present? %>
-                  <span class="<%= household.building_name.present? ? '' : '' %>">Unit <%= household.unit_number %></span>
-                <% end %>
-              </p>
+        <% today_pickup = household.pickups.find_by(created_at: Date.current.all_day) %>
+        <li>
+          <% if today_pickup %>
+            <%= link_to agent_pickup_path(today_pickup), class: "block px-4 py-3 hover:bg-gray-50 transition" do %>
+              <div class="flex items-center justify-between">
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm font-medium text-gray-900 truncate"><%= household.address %></p>
+                  <p class="text-xs text-gray-500 mt-0.5">
+                    <% if household.building_name.present? %><%= household.building_name %><% end %>
+                    <% if household.unit_number.present? %> Unit <%= household.unit_number %><% end %>
+                  </p>
+                </div>
+                <div class="ml-3 flex-shrink-0 flex items-center space-x-2">
+                  <% case today_pickup.status %>
+                  <% when "scheduled" %>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Scheduled</span>
+                  <% when "in_progress" %>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">In Progress</span>
+                  <% when "completed" %>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Completed</span>
+                  <% when "missed" %>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Missed</span>
+                  <% end %>
+                  <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </div>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="px-4 py-3">
+              <div class="flex items-center justify-between">
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm font-medium text-gray-900 truncate"><%= household.address %></p>
+                  <p class="text-xs text-gray-500 mt-0.5">
+                    <% if household.building_name.present? %><%= household.building_name %><% end %>
+                    <% if household.unit_number.present? %> Unit <%= household.unit_number %><% end %>
+                  </p>
+                </div>
+                <div class="ml-3 flex-shrink-0">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">No Pickup</span>
+                </div>
+              </div>
             </div>
-            <div class="ml-3 flex-shrink-0">
-              <% today_pickup = household.pickups.find_by(created_at: Date.current.all_day) %>
-              <% if today_pickup %>
-                <% case today_pickup.status %>
-                <% when "scheduled" %>
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Scheduled</span>
-                <% when "in_progress" %>
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">In Progress</span>
-                <% when "completed" %>
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Completed</span>
-                <% when "missed" %>
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Missed</span>
-                <% end %>
-              <% else %>
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">No Pickup</span>
-              <% end %>
-            </div>
-          </div>
+          <% end %>
         </li>
       <% end %>
     </ul>

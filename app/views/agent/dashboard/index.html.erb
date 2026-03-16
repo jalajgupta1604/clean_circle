@@ -5,6 +5,31 @@
   <p class="text-sm text-gray-500 mt-1"><%= Date.current.strftime("%A, %B %d, %Y") %></p>
 </div>
 
+<%# Start Route button %>
+<% if @routes.any? %>
+  <%= link_to agent_route_path(@routes.first),
+    class: "flex items-center justify-center w-full bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold py-4 rounded-xl shadow-md transition mb-6" do %>
+    <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    Start Route
+  <% end %>
+<% end %>
+
+<%# Pickups remaining today - prominent display %>
+<div class="bg-blue-50 border border-blue-200 rounded-xl px-5 py-4 mb-6 flex items-center justify-between">
+  <div>
+    <p class="text-sm font-medium text-blue-700 uppercase tracking-wide">Pickups Remaining Today</p>
+    <p class="text-3xl font-bold text-blue-800 mt-1"><%= @pending_today %></p>
+  </div>
+  <div class="text-right">
+    <p class="text-sm text-blue-600 font-medium"><%= @completed_today %> of <%= @total_today %> pickups completed today</p>
+    <% if @total_today > 0 %>
+      <div class="mt-2 w-40 bg-blue-200 rounded-full h-2">
+        <div class="h-2 rounded-full bg-blue-600" style="width: <%= ((@completed_today.to_f / @total_today) * 100).round %>%"></div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
 <%# Today's stats %>
 <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 mb-6">
   <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">

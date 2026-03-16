@@ -91,6 +91,12 @@ module Admin
       end
       @reduction_trend.reverse!
 
+      # Environmental impact: 1000L waste managed properly = 5kg CO2 saved, 100kg CO2 = 1 tree
+      @environmental_impact = {
+        co2_saved: (@total_waste * 0.005).round(1),
+        trees_equivalent: (@total_waste * 0.005 / 100).round(1)
+      }
+
       # Pickup stats
       total_pickups = Pickup.count
       completed_count = completed_pickups.count
