@@ -9,14 +9,14 @@
   <%= javascript_importmap_tags %>
 </head>
 <body class="h-full">
-  <div class="min-h-full">
+  <div class="min-h-full" data-controller="mobile-menu">
     <!-- Mobile sidebar overlay -->
-    <div id="mobile-sidebar-overlay" class="fixed inset-0 z-40 hidden">
-      <div class="fixed inset-0 bg-gray-600 bg-opacity-75" data-action="click->admin-sidebar#close"></div>
-      <div id="mobile-sidebar" class="relative flex w-64 flex-col bg-indigo-900 h-full transform -translate-x-full transition-transform duration-300 ease-in-out">
+    <div data-mobile-menu-target="overlay" class="fixed inset-0 z-40 hidden">
+      <div class="fixed inset-0 bg-gray-600 bg-opacity-75" data-action="click->mobile-menu#close"></div>
+      <div data-mobile-menu-target="sidebar" class="relative flex w-64 flex-col bg-indigo-900 h-full transform -translate-x-full transition-transform duration-300 ease-in-out">
         <div class="flex items-center justify-between h-16 px-4 bg-indigo-950">
           <span class="text-xl font-bold text-white tracking-tight">CleanCircle</span>
-          <button onclick="closeMobileSidebar()" class="text-indigo-300 hover:text-white">
+          <button data-action="click->mobile-menu#close" class="text-indigo-300 hover:text-white">
             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
@@ -76,7 +76,7 @@
     <div class="lg:pl-64">
       <!-- Top bar -->
       <div class="sticky top-0 z-30 flex h-16 shrink-0 items-center border-b border-gray-200 bg-white shadow-sm">
-        <button onclick="openMobileSidebar()" class="px-4 text-gray-500 hover:text-gray-700 lg:hidden">
+        <button data-action="click->mobile-menu#toggle" class="px-4 text-gray-500 hover:text-gray-700 lg:hidden">
           <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
           </svg>
@@ -92,26 +92,32 @@
 
       <!-- Flash messages -->
       <% if notice.present? %>
-        <div class="mx-4 mt-4 lg:mx-8">
+        <div class="mx-4 mt-4 lg:mx-8" data-controller="flash">
           <div class="rounded-lg bg-green-50 border border-green-200 p-4">
-            <div class="flex">
-              <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-              </svg>
-              <p class="ml-3 text-sm font-medium text-green-800"><%= notice %></p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <p class="ml-3 text-sm font-medium text-green-800"><%= notice %></p>
+              </div>
+              <button data-action="click->flash#dismiss" class="text-green-500 hover:text-green-700">&times;</button>
             </div>
           </div>
         </div>
       <% end %>
 
       <% if alert.present? %>
-        <div class="mx-4 mt-4 lg:mx-8">
+        <div class="mx-4 mt-4 lg:mx-8" data-controller="flash">
           <div class="rounded-lg bg-red-50 border border-red-200 p-4">
-            <div class="flex">
-              <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-              </svg>
-              <p class="ml-3 text-sm font-medium text-red-800"><%= alert %></p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+                <p class="ml-3 text-sm font-medium text-red-800"><%= alert %></p>
+              </div>
+              <button data-action="click->flash#dismiss" class="text-red-500 hover:text-red-700">&times;</button>
             </div>
           </div>
         </div>
@@ -124,20 +130,5 @@
     </div>
   </div>
 
-  <script>
-    function openMobileSidebar() {
-      const overlay = document.getElementById('mobile-sidebar-overlay');
-      const sidebar = document.getElementById('mobile-sidebar');
-      overlay.classList.remove('hidden');
-      setTimeout(() => sidebar.classList.remove('-translate-x-full'), 10);
-    }
-
-    function closeMobileSidebar() {
-      const overlay = document.getElementById('mobile-sidebar-overlay');
-      const sidebar = document.getElementById('mobile-sidebar');
-      sidebar.classList.add('-translate-x-full');
-      setTimeout(() => overlay.classList.add('hidden'), 300);
-    }
-  </script>
 </body>
 </html>

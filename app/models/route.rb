@@ -5,6 +5,16 @@ class Route < ApplicationRecord
 
   validates :name, presence: true
   validates :area, presence: true
+  validate :agent_must_have_agent_role
+
+  private
+
+  def agent_must_have_agent_role
+    return unless agent_id.present? && agent.present?
+    errors.add(:agent, "must have agent role") unless agent.agent?
+  end
+
+  public
 
   def today_pickups
     pickups.where(created_at: Date.current.all_day)

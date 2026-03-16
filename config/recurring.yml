@@ -1,15 +1,24 @@
-# examples:
-#   periodic_cleanup:
-#     class: CleanSoftDeletedRecordsJob
-#     queue: background
-#     args: [ 1000, { batch_size: 500 } ]
-#     schedule: every hour
-#   periodic_cleanup_with_command:
-#     command: "SoftDeletedRecord.due.delete_all"
-#     priority: 2
-#     schedule: at 5am every day
-
 production:
   clear_solid_queue_finished_jobs:
     command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
     schedule: every hour at minute 12
+
+  schedule_daily_pickups:
+    class: ScheduleDailyPickupsJob
+    queue: default
+    schedule: every day at 6am
+
+  expire_subscriptions:
+    class: ExpireSubscriptionsJob
+    queue: default
+    schedule: every day at midnight
+
+  detect_missed_pickups:
+    class: DetectMissedPickupsJob
+    queue: default
+    schedule: every day at 10pm
+
+  low_balance_reminder:
+    class: LowBalanceReminderJob
+    queue: default
+    schedule: every day at 9am

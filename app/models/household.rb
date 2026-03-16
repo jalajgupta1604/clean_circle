@@ -3,6 +3,7 @@ class Household < ApplicationRecord
   belongs_to :route, optional: true
   has_many :pickups, dependent: :destroy
 
+  validates :user, presence: true
   validates :address, presence: true
   validates :qr_code_token, uniqueness: true, allow_blank: true
 

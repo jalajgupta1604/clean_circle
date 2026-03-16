@@ -9,6 +9,11 @@ class Subscription < ApplicationRecord
   validate :no_overlapping_active_subscription, on: :create
 
   scope :current, -> { where(status: :active).where("starts_on <= ? AND ends_on >= ?", Date.current, Date.current) }
+  scope :expiring_soon, -> { active.where("ends_on <= ?", 3.days.from_now) }
+
+  def expired?
+    ends_on < Date.current
+  end
 
   def days_remaining
     return 0 if expired? || cancelled?

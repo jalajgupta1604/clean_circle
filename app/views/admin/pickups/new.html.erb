@@ -1,0 +1,33 @@
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-900">Schedule Pickups</h2>
+      <p class="mt-1 text-sm text-gray-500">Create pickups for all active-subscription households on a route</p>
+    </div>
+    <%= link_to "Back to Pickups", admin_pickups_path, class: "rounded-lg bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50 transition-colors" %>
+  </div>
+
+  <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 p-6">
+    <%= form_with url: admin_pickups_path, method: :post, class: "space-y-6" do |f| %>
+      <div>
+        <%= f.label :route_id, "Select Route", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.select :route_id,
+              @routes.map { |r| ["#{r.name} — #{r.area} (Agent: #{r.agent&.name || 'Unassigned'})", r.id] },
+              { prompt: "Choose a route..." },
+              class: "block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm" %>
+        <p class="mt-1 text-xs text-gray-500">Pickups will be created for all households with active subscriptions on this route.</p>
+      </div>
+
+      <div>
+        <%= f.label :date, "Pickup Date", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.date_field :date, value: Date.current, class: "block rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm" %>
+        <p class="mt-1 text-xs text-gray-500">Defaults to today. Households that already have a pickup for this date will be skipped.</p>
+      </div>
+
+      <div class="flex items-center gap-3 pt-2">
+        <%= f.submit "Schedule Pickups", class: "rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 cursor-pointer transition-colors" %>
+        <%= link_to "Cancel", admin_pickups_path, class: "text-sm font-medium text-gray-600 hover:text-gray-900" %>
+      </div>
+    <% end %>
+  </div>
+</div>

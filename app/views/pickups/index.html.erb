@@ -12,6 +12,7 @@
       <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">My Pickups</h1>
       <p class="mt-1 text-gray-500">Track all your waste collection pickups</p>
     </div>
+    <%= link_to "Request Pickup", new_pickup_path, class: "inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 transition-colors" %>
   </div>
 
   <% if @pickups.present? %>

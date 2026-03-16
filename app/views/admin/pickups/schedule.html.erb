@@ -1,0 +1,44 @@
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-900">Batch Schedule Pickups</h2>
+      <p class="mt-1 text-sm text-gray-500">Schedule pickups for multiple routes at once</p>
+    </div>
+    <%= link_to "Back to Pickups", admin_pickups_path, class: "rounded-lg bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50 transition-colors" %>
+  </div>
+
+  <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 p-6">
+    <%= form_with url: batch_create_admin_pickups_path, method: :post, class: "space-y-6" do |f| %>
+      <div>
+        <%= f.label :date, "Pickup Date", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.date_field :date, value: Date.current, class: "block rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm" %>
+      </div>
+
+      <div>
+        <p class="block text-sm font-medium text-gray-700 mb-3">Select Routes</p>
+        <div class="space-y-3">
+          <% @routes.each do |route| %>
+            <label class="flex items-center gap-3 p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer">
+              <input type="checkbox" name="route_ids[]" value="<%= route.id %>" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+              <div class="flex-1">
+                <p class="font-medium text-gray-900"><%= route.name %></p>
+                <p class="text-sm text-gray-500">
+                  <%= route.area %> &middot; Agent: <%= route.agent&.name || "Unassigned" %> &middot;
+                  <%= route.households.count %> households
+                </p>
+              </div>
+            </label>
+          <% end %>
+        </div>
+        <% if @routes.empty? %>
+          <p class="text-sm text-gray-500 italic">No routes available. Create routes first.</p>
+        <% end %>
+      </div>
+
+      <div class="flex items-center gap-3 pt-2">
+        <%= f.submit "Schedule All Selected", class: "rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 cursor-pointer transition-colors" %>
+        <%= link_to "Cancel", admin_pickups_path, class: "text-sm font-medium text-gray-600 hover:text-gray-900" %>
+      </div>
+    <% end %>
+  </div>
+</div>

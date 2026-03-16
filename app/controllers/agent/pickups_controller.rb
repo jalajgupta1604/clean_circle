@@ -26,7 +26,7 @@ module Agent
     end
 
     def mark_missed
-      @pickup.mark_missed!(notes: params[:notes])
+      @pickup.mark_missed!(params[:notes])
 
       redirect_to agent_route_pickup_path(@route, @pickup),
                   notice: "Pickup marked as missed."

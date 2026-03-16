@@ -30,7 +30,7 @@ Rails.application.routes.draw do
   resource :wallet, only: [:show] do
     post :recharge
   end
-  resources :pickups, only: [:index, :show]
+  resources :pickups, only: [:index, :show, :new, :create]
   resources :notifications, only: [:index] do
     member do
       patch :mark_read
@@ -65,7 +65,12 @@ Rails.application.routes.draw do
     resources :agents, only: [:index, :show, :edit, :update]
     resources :routes
     resources :households, only: [:index, :show]
-    resources :pickups, only: [:index, :show]
+    resources :pickups, only: [:index, :show, :new, :create] do
+      collection do
+        get :schedule
+        post :batch_create
+      end
+    end
     resources :subscription_plans
     resources :subscriptions, only: [:index, :show]
     get "revenue", to: "revenue#index"

@@ -1,6 +1,10 @@
 <div class="space-y-6">
   <div class="flex items-center justify-between">
     <h2 class="text-2xl font-bold text-gray-900">Pickups</h2>
+    <div class="flex items-center gap-3">
+      <%= link_to "Schedule Route", new_admin_pickup_path, class: "rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 transition-colors" %>
+      <%= link_to "Batch Schedule", schedule_admin_pickups_path, class: "rounded-lg bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50 transition-colors" %>
+    </div>
   </div>
 
   <!-- Filters -->
