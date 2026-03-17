@@ -10,9 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_16_120000) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_17_000003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "badges", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.string "icon"
+    t.string "criteria_type"
+    t.integer "criteria_value"
+    t.string "category"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "households", force: :cascade do |t|
     t.bigint "user_id", null: false
@@ -58,6 +69,35 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_16_120000) do
     t.index ["route_id"], name: "index_pickups_on_route_id"
   end
 
+  create_table "report_automations", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "report_type", null: false
+    t.string "schedule", default: "monthly", null: false
+    t.string "format", default: "pdf", null: false
+    t.text "recipients"
+    t.string "status", default: "active", null: false
+    t.datetime "last_run_at"
+    t.datetime "next_run_at"
+    t.jsonb "branding_settings", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["next_run_at"], name: "index_report_automations_on_next_run_at"
+    t.index ["status"], name: "index_report_automations_on_status"
+  end
+
+  create_table "report_runs", force: :cascade do |t|
+    t.bigint "report_automation_id", null: false
+    t.string "status", default: "pending", null: false
+    t.string "file_path"
+    t.text "error_message"
+    t.datetime "started_at"
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["report_automation_id"], name: "index_report_runs_on_report_automation_id"
+    t.index ["status"], name: "index_report_runs_on_status"
+  end
+
   create_table "routes", force: :cascade do |t|
     t.string "name"
     t.string "area"
@@ -87,6 +127,45 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_16_120000) do
     t.datetime "updated_at", null: false
     t.index ["subscription_plan_id"], name: "index_subscriptions_on_subscription_plan_id"
     t.index ["user_id"], name: "index_subscriptions_on_user_id"
+  end
+
+  create_table "support_tickets", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "pickup_id"
+    t.string "ticket_number", null: false
+    t.string "category", null: false
+    t.string "status", default: "submitted"
+    t.text "description"
+    t.text "admin_notes"
+    t.datetime "resolved_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["pickup_id"], name: "index_support_tickets_on_pickup_id"
+    t.index ["status"], name: "index_support_tickets_on_status"
+    t.index ["ticket_number"], name: "index_support_tickets_on_ticket_number", unique: true
+    t.index ["user_id"], name: "index_support_tickets_on_user_id"
+  end
+
+  create_table "ticket_messages", force: :cascade do |t|
+    t.bigint "support_ticket_id", null: false
+    t.bigint "user_id", null: false
+    t.text "body", null: false
+    t.boolean "from_admin", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["support_ticket_id"], name: "index_ticket_messages_on_support_ticket_id"
+    t.index ["user_id"], name: "index_ticket_messages_on_user_id"
+  end
+
+  create_table "user_badges", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "badge_id", null: false
+    t.datetime "earned_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["badge_id"], name: "index_user_badges_on_badge_id"
+    t.index ["user_id", "badge_id"], name: "index_user_badges_on_user_id_and_badge_id", unique: true
+    t.index ["user_id"], name: "index_user_badges_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -141,9 +220,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_16_120000) do
   add_foreign_key "pickups", "households"
   add_foreign_key "pickups", "routes"
   add_foreign_key "pickups", "users", column: "agent_id"
+  add_foreign_key "report_runs", "report_automations"
   add_foreign_key "routes", "users", column: "agent_id"
   add_foreign_key "subscriptions", "subscription_plans"
   add_foreign_key "subscriptions", "users"
+  add_foreign_key "support_tickets", "pickups"
+  add_foreign_key "support_tickets", "users"
+  add_foreign_key "ticket_messages", "support_tickets"
+  add_foreign_key "ticket_messages", "users"
+  add_foreign_key "user_badges", "badges"
+  add_foreign_key "user_badges", "users"
   add_foreign_key "wallet_transactions", "wallets"
   add_foreign_key "wallets", "users"
 end

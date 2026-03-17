@@ -1,80 +1,91 @@
 <div class="space-y-6">
-  <div class="flex items-center space-x-3">
-    <%= link_to admin_households_path, class: "text-gray-400 hover:text-gray-600" do %>
-      <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-      </svg>
+  <!-- Header with back navigation -->
+  <div class="flex items-center gap-3">
+    <%= link_to admin_households_path, class: "p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors" do %>
+      <span class="material-symbols-outlined">arrow_back</span>
     <% end %>
-    <h2 class="text-2xl font-bold text-gray-900">Household Details</h2>
+    <div>
+      <h2 class="text-2xl font-bold text-slate-900">Household Details</h2>
+      <p class="text-sm text-slate-500"><%= @household.address %></p>
+    </div>
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Household Info -->
-    <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 p-6">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">Household Information</h3>
+    <div class="rounded-xl bg-white shadow-sm border border-slate-200 p-6">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="material-symbols-outlined text-[#2e7d32]">home</span>
+        <h3 class="text-lg font-bold text-slate-900">Household Information</h3>
+      </div>
       <dl class="space-y-3">
         <div>
-          <dt class="text-sm font-medium text-gray-500">Address</dt>
-          <dd class="mt-1 text-sm text-gray-900"><%= @household.address %></dd>
+          <dt class="text-xs font-bold text-slate-400 uppercase tracking-wider">Address</dt>
+          <dd class="mt-1 text-sm text-slate-900 font-medium"><%= @household.address %></dd>
         </div>
         <div>
-          <dt class="text-sm font-medium text-gray-500">Created</dt>
-          <dd class="mt-1 text-sm text-gray-900"><%= @household.created_at.strftime("%B %d, %Y") %></dd>
+          <dt class="text-xs font-bold text-slate-400 uppercase tracking-wider">Created</dt>
+          <dd class="mt-1 text-sm text-slate-900"><%= @household.created_at.strftime("%B %d, %Y") %></dd>
         </div>
       </dl>
     </div>
 
     <!-- User Info -->
-    <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 p-6">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">User</h3>
+    <div class="rounded-xl bg-white shadow-sm border border-slate-200 p-6">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="material-symbols-outlined text-[#2e7d32]">person</span>
+        <h3 class="text-lg font-bold text-slate-900">User</h3>
+      </div>
       <% if @household.user.present? %>
         <dl class="space-y-3">
           <div>
-            <dt class="text-sm font-medium text-gray-500">Name</dt>
-            <dd class="mt-1 text-sm text-gray-900">
-              <%= link_to @household.user.name, admin_user_path(@household.user), class: "text-indigo-600 hover:text-indigo-900" %>
+            <dt class="text-xs font-bold text-slate-400 uppercase tracking-wider">Name</dt>
+            <dd class="mt-1 text-sm">
+              <%= link_to @household.user.name, admin_user_path(@household.user), class: "text-[#2e7d32] hover:underline font-semibold" %>
             </dd>
           </div>
           <div>
-            <dt class="text-sm font-medium text-gray-500">Email</dt>
-            <dd class="mt-1 text-sm text-gray-900"><%= @household.user.email %></dd>
+            <dt class="text-xs font-bold text-slate-400 uppercase tracking-wider">Email</dt>
+            <dd class="mt-1 text-sm text-slate-900"><%= @household.user.email %></dd>
           </div>
           <div>
-            <dt class="text-sm font-medium text-gray-500">Phone</dt>
-            <dd class="mt-1 text-sm text-gray-900"><%= @household.user.phone || "N/A" %></dd>
+            <dt class="text-xs font-bold text-slate-400 uppercase tracking-wider">Phone</dt>
+            <dd class="mt-1 text-sm text-slate-900"><%= @household.user.phone || "N/A" %></dd>
           </div>
           <div>
-            <dt class="text-sm font-medium text-gray-500">Family Size</dt>
-            <dd class="mt-1 text-sm text-gray-900"><%= @household.user.family_size || "N/A" %></dd>
+            <dt class="text-xs font-bold text-slate-400 uppercase tracking-wider">Family Size</dt>
+            <dd class="mt-1 text-sm text-slate-900"><%= @household.user.family_size || "N/A" %></dd>
           </div>
         </dl>
       <% else %>
-        <p class="text-sm text-gray-500">No user assigned</p>
+        <p class="text-sm text-slate-500">No user assigned</p>
       <% end %>
     </div>
 
     <!-- Route Info -->
-    <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 p-6">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">Route</h3>
+    <div class="rounded-xl bg-white shadow-sm border border-slate-200 p-6">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="material-symbols-outlined text-[#2e7d32]">route</span>
+        <h3 class="text-lg font-bold text-slate-900">Route</h3>
+      </div>
       <% if @household.route.present? %>
         <dl class="space-y-3">
           <div>
-            <dt class="text-sm font-medium text-gray-500">Route Name</dt>
-            <dd class="mt-1 text-sm text-gray-900">
-              <%= link_to @household.route.name, admin_route_path(@household.route), class: "text-indigo-600 hover:text-indigo-900" %>
+            <dt class="text-xs font-bold text-slate-400 uppercase tracking-wider">Route Name</dt>
+            <dd class="mt-1 text-sm">
+              <%= link_to @household.route.name, admin_route_path(@household.route), class: "text-[#2e7d32] hover:underline font-semibold" %>
             </dd>
           </div>
           <div>
-            <dt class="text-sm font-medium text-gray-500">Area</dt>
-            <dd class="mt-1 text-sm text-gray-900"><%= @household.route.area %></dd>
+            <dt class="text-xs font-bold text-slate-400 uppercase tracking-wider">Area</dt>
+            <dd class="mt-1 text-sm text-slate-900"><%= @household.route.area %></dd>
           </div>
           <div>
-            <dt class="text-sm font-medium text-gray-500">Agent</dt>
-            <dd class="mt-1 text-sm text-gray-900"><%= @household.route.agent&.name || "Unassigned" %></dd>
+            <dt class="text-xs font-bold text-slate-400 uppercase tracking-wider">Agent</dt>
+            <dd class="mt-1 text-sm text-slate-900"><%= @household.route.agent&.name || "Unassigned" %></dd>
           </div>
         </dl>
       <% else %>
-        <p class="text-sm text-gray-500">No route assigned</p>
+        <p class="text-sm text-slate-500">No route assigned</p>
       <% end %>
     </div>
   </div>
@@ -82,118 +93,136 @@
   <!-- Subscription & Wallet Management -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <!-- Change Plan Section -->
-    <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 p-6">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">Subscription Plan</h3>
+    <div class="rounded-xl bg-white shadow-sm border border-slate-200 p-6">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="material-symbols-outlined text-[#2e7d32]">card_membership</span>
+        <h3 class="text-lg font-bold text-slate-900">Subscription Plan</h3>
+      </div>
       <% if @subscription.present? %>
         <dl class="space-y-3 mb-4">
           <div>
-            <dt class="text-sm font-medium text-gray-500">Current Plan</dt>
-            <dd class="mt-1 text-sm text-gray-900 font-semibold"><%= @subscription.subscription_plan.name %> (<%= @subscription.subscription_plan.bucket_size %>L)</dd>
+            <dt class="text-xs font-bold text-slate-400 uppercase tracking-wider">Current Plan</dt>
+            <dd class="mt-1">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700">
+                <%= @subscription.subscription_plan.name %> (<%= @subscription.subscription_plan.bucket_size %>L)
+              </span>
+            </dd>
           </div>
           <div>
-            <dt class="text-sm font-medium text-gray-500">Status</dt>
+            <dt class="text-xs font-bold text-slate-400 uppercase tracking-wider">Status</dt>
             <dd class="mt-1">
-              <% sub_status_classes = { "active" => "bg-green-100 text-green-800", "paused" => "bg-yellow-100 text-yellow-800", "cancelled" => "bg-red-100 text-red-800", "expired" => "bg-gray-100 text-gray-800" } %>
-              <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium <%= sub_status_classes[@subscription.status] || 'bg-gray-100 text-gray-800' %>">
+              <% sub_status_classes = { "active" => "bg-green-100 text-green-700", "paused" => "bg-yellow-100 text-yellow-700", "cancelled" => "bg-red-100 text-red-700", "expired" => "bg-slate-100 text-slate-600" } %>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold <%= sub_status_classes[@subscription.status] || 'bg-slate-100 text-slate-600' %>">
                 <%= @subscription.status.humanize %>
               </span>
             </dd>
           </div>
           <div>
-            <dt class="text-sm font-medium text-gray-500">End Date</dt>
-            <dd class="mt-1 text-sm text-gray-900"><%= @subscription.ends_on.strftime("%B %d, %Y") %></dd>
+            <dt class="text-xs font-bold text-slate-400 uppercase tracking-wider">End Date</dt>
+            <dd class="mt-1 text-sm text-slate-900"><%= @subscription.ends_on.strftime("%B %d, %Y") %></dd>
           </div>
           <div>
-            <dt class="text-sm font-medium text-gray-500">Days Remaining</dt>
-            <dd class="mt-1 text-sm text-gray-900"><%= @subscription.days_remaining %> days</dd>
+            <dt class="text-xs font-bold text-slate-400 uppercase tracking-wider">Days Remaining</dt>
+            <dd class="mt-1 text-sm text-slate-900"><%= @subscription.days_remaining %> days</dd>
           </div>
         </dl>
-        <div class="border-t border-gray-200 pt-4">
-          <p class="text-sm font-medium text-gray-700 mb-2">Change Plan</p>
+        <div class="border-t border-slate-100 pt-4">
+          <p class="text-sm font-bold text-slate-700 mb-2">Change Plan</p>
           <%= form_with url: admin_subscription_path(@subscription), method: :patch, class: "flex items-end space-x-3" do |f| %>
             <div class="flex-1">
-              <label for="subscription_plan_id" class="block text-xs font-medium text-gray-500 mb-1">New Plan</label>
-              <select name="subscription[subscription_plan_id]" id="subscription_plan_id" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+              <label for="subscription_plan_id" class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">New Plan</label>
+              <select name="subscription[subscription_plan_id]" id="subscription_plan_id" class="block w-full rounded-xl border-slate-200 shadow-sm focus:border-[#2e7d32] focus:ring-[#2e7d32] text-sm">
                 <% @subscription_plans.each do |plan| %>
                   <option value="<%= plan.id %>" <%= 'selected' if plan.id == @subscription.subscription_plan_id %>><%= plan.name %> - <%= number_to_currency(plan.price) %> (<%= plan.bucket_size %>L)</option>
                 <% end %>
               </select>
             </div>
-            <%= f.submit "Change Plan", class: "inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 cursor-pointer" %>
+            <%= f.submit "Change Plan", class: "inline-flex items-center rounded-xl bg-[#2e7d32] px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-[#1b5e20] focus:outline-none focus:ring-2 focus:ring-[#2e7d32] focus:ring-offset-2 cursor-pointer transition-colors" %>
           <% end %>
         </div>
       <% else %>
-        <p class="text-sm text-gray-500">No active subscription</p>
+        <p class="text-sm text-slate-500">No active subscription</p>
       <% end %>
     </div>
 
     <!-- Adjust Wallet Section -->
-    <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 p-6">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">Wallet</h3>
+    <div class="rounded-xl bg-white shadow-sm border border-slate-200 p-6">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="material-symbols-outlined text-[#2e7d32]">account_balance_wallet</span>
+        <h3 class="text-lg font-bold text-slate-900">Wallet</h3>
+      </div>
       <% if @wallet.present? %>
         <div class="mb-4">
-          <p class="text-sm font-medium text-gray-500">Current Balance</p>
-          <p class="text-3xl font-bold text-indigo-600 mt-1"><%= number_to_currency(@wallet.balance) %></p>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Current Balance</p>
+          <p class="text-3xl font-black text-[#2e7d32] mt-1"><%= number_to_currency(@wallet.balance) %></p>
         </div>
-        <div class="border-t border-gray-200 pt-4">
-          <p class="text-sm font-medium text-gray-700 mb-2">Adjust Wallet</p>
+        <div class="border-t border-slate-100 pt-4">
+          <p class="text-sm font-bold text-slate-700 mb-2">Adjust Wallet</p>
           <%= form_with url: adjust_wallet_admin_household_path(@household), method: :post, class: "space-y-3" do |f| %>
             <div>
-              <label for="amount" class="block text-xs font-medium text-gray-500 mb-1">Amount</label>
-              <input type="number" name="amount" id="amount" step="0.01" min="0.01" required class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm" placeholder="0.00">
+              <label for="amount" class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Amount</label>
+              <input type="number" name="amount" id="amount" step="0.01" min="0.01" required class="block w-full rounded-xl border-slate-200 shadow-sm focus:border-[#2e7d32] focus:ring-[#2e7d32] text-sm" placeholder="0.00">
             </div>
             <div>
-              <label for="transaction_type" class="block text-xs font-medium text-gray-500 mb-1">Type</label>
-              <select name="transaction_type" id="transaction_type" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+              <label for="transaction_type" class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Type</label>
+              <select name="transaction_type" id="transaction_type" class="block w-full rounded-xl border-slate-200 shadow-sm focus:border-[#2e7d32] focus:ring-[#2e7d32] text-sm">
                 <option value="credit">Credit (Add funds)</option>
                 <option value="debit">Debit (Deduct funds)</option>
               </select>
             </div>
             <div>
-              <label for="description" class="block text-xs font-medium text-gray-500 mb-1">Description</label>
-              <input type="text" name="description" id="description" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm" placeholder="Admin adjustment">
+              <label for="description" class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Description</label>
+              <input type="text" name="description" id="description" class="block w-full rounded-xl border-slate-200 shadow-sm focus:border-[#2e7d32] focus:ring-[#2e7d32] text-sm" placeholder="Admin adjustment">
             </div>
-            <%= f.submit "Submit Adjustment", class: "w-full inline-flex justify-center items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 cursor-pointer" %>
+            <%= f.submit "Submit Adjustment", class: "w-full inline-flex justify-center items-center rounded-xl bg-[#2e7d32] px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-[#1b5e20] focus:outline-none focus:ring-2 focus:ring-[#2e7d32] focus:ring-offset-2 cursor-pointer transition-colors" %>
           <% end %>
         </div>
       <% else %>
-        <p class="text-sm text-gray-500">No wallet found for this household</p>
+        <p class="text-sm text-slate-500">No wallet found for this household</p>
       <% end %>
     </div>
   </div>
 
   <!-- Pickups History -->
-  <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 overflow-hidden">
-    <div class="px-6 py-4 border-b border-gray-200">
-      <h3 class="text-lg font-semibold text-gray-900">Pickup History</h3>
+  <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
+      <span class="material-symbols-outlined text-[#2e7d32]">history</span>
+      <h3 class="text-lg font-bold text-slate-900">Pickup History</h3>
     </div>
     <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
+      <table class="w-full text-left">
+        <thead class="bg-slate-50/50 text-[10px] uppercase tracking-wider text-slate-500 font-bold">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">ID</th>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Agent</th>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Scheduled</th>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Completed</th>
-            <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+            <th class="px-6 py-4">ID</th>
+            <th class="px-6 py-4">Agent</th>
+            <th class="px-6 py-4">Status</th>
+            <th class="px-6 py-4">Scheduled</th>
+            <th class="px-6 py-4">Completed</th>
+            <th class="px-6 py-4 text-right">Actions</th>
           </tr>
         </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
+        <tbody class="divide-y divide-slate-100 text-sm">
           <% @household.pickups.order(created_at: :desc).each do |pickup| %>
-            <tr class="hover:bg-gray-50 transition-colors">
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#<%= pickup.id %></td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700"><%= pickup.agent&.name || "N/A" %></td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <% status_classes = { "completed" => "bg-green-100 text-green-800", "pending" => "bg-yellow-100 text-yellow-800", "missed" => "bg-red-100 text-red-800", "in_progress" => "bg-blue-100 text-blue-800" } %>
-                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium <%= status_classes[pickup.status] || 'bg-gray-100 text-gray-800' %>">
+            <tr class="hover:bg-slate-50 transition-colors">
+              <td class="px-6 py-4 font-medium text-slate-900">#<%= pickup.id %></td>
+              <td class="px-6 py-4 text-slate-700"><%= pickup.agent&.name || "N/A" %></td>
+              <td class="px-6 py-4">
+                <% status_config = {
+                  "completed" => { dot: "bg-green-600", bg: "bg-green-100", text: "text-green-700" },
+                  "pending" => { dot: "bg-yellow-600", bg: "bg-yellow-100", text: "text-yellow-700" },
+                  "missed" => { dot: "bg-red-600", bg: "bg-red-100", text: "text-red-700" },
+                  "in_progress" => { dot: "bg-blue-600", bg: "bg-blue-100", text: "text-blue-700" }
+                } %>
+                <% config = status_config[pickup.status] || { dot: "bg-slate-500", bg: "bg-slate-100", text: "text-slate-700" } %>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold <%= config[:bg] %> <%= config[:text] %>">
+                  <span class="w-1.5 h-1.5 rounded-full <%= config[:dot] %>"></span>
                   <%= pickup.status&.humanize %>
                 </span>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= pickup.created_at&.strftime("%b %d, %Y %I:%M %p") %></td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= pickup.confirmed_at&.strftime("%b %d, %Y %I:%M %p") || "-" %></td>
-              <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
-                <%= link_to "View", admin_pickup_path(pickup), class: "text-indigo-600 hover:text-indigo-900 font-medium" %>
+              <td class="px-6 py-4 text-slate-500 text-xs"><%= pickup.created_at&.strftime("%b %d, %Y %I:%M %p") %></td>
+              <td class="px-6 py-4 text-slate-500 text-xs"><%= pickup.confirmed_at&.strftime("%b %d, %Y %I:%M %p") || "-" %></td>
+              <td class="px-6 py-4 text-right">
+                <%= link_to "View", admin_pickup_path(pickup), class: "text-[#2e7d32] hover:text-[#1b5e20] font-bold text-xs" %>
               </td>
             </tr>
           <% end %>

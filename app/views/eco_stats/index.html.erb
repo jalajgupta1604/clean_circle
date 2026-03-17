@@ -1,0 +1,154 @@
+<% content_for(:page_title) { "Eco Stats" } %>
+
+<div class="space-y-6">
+  <%# Sustainability Impact & Eco Grade %>
+  <section class="grid grid-cols-2 gap-4">
+    <div class="bg-white p-5 rounded-xl border border-slate-100 shadow-sm flex flex-col justify-between">
+      <div>
+        <span class="material-symbols-outlined text-[#ec5b13] mb-2">energy_savings_leaf</span>
+        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Impact</p>
+        <h3 class="text-xl font-bold mt-1 text-slate-900"><%= @waste_diverted %> kg</h3>
+        <p class="text-xs text-slate-500">Waste diverted</p>
+      </div>
+      <div class="mt-4 flex items-center text-[#ec5b13] text-xs font-bold">
+        <span class="material-symbols-outlined text-sm mr-1">trending_up</span>
+        <span><%= @waste_trend %> this month</span>
+      </div>
+    </div>
+    <div class="bg-white p-5 rounded-xl border border-slate-100 shadow-sm flex flex-col justify-between">
+      <div>
+        <span class="material-symbols-outlined text-emerald-600 mb-2">verified</span>
+        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Eco Grade</p>
+        <h3 class="text-3xl font-bold mt-1 text-emerald-600"><%= @eco_grade %></h3>
+      </div>
+      <div class="mt-4 flex items-center text-slate-500 text-xs">
+        <span>Score: <%= @eco_score %>/100</span>
+      </div>
+    </div>
+  </section>
+
+  <%# Carbon Offset Tracker %>
+  <section class="bg-[#ec5b13] text-white p-5 rounded-xl shadow-lg relative overflow-hidden">
+    <div class="relative z-10">
+      <h2 class="text-sm font-semibold opacity-90 uppercase tracking-widest">Carbon Offset</h2>
+      <div class="mt-3 flex items-end gap-3">
+        <span class="text-4xl font-bold"><%= @co2_offset %></span>
+        <span class="text-lg font-medium opacity-80 mb-1">CO2e tons</span>
+      </div>
+      <div class="mt-6 flex gap-4 flex-wrap">
+        <div class="flex items-center gap-2 bg-white/20 px-3 py-2 rounded-lg backdrop-blur-sm">
+          <span class="material-symbols-outlined text-sm">forest</span>
+          <span class="text-xs font-medium"><%= @trees_equivalent %> Trees equivalent</span>
+        </div>
+        <div class="flex items-center gap-2 bg-white/20 px-3 py-2 rounded-lg backdrop-blur-sm">
+          <span class="material-symbols-outlined text-sm">directions_car</span>
+          <span class="text-xs font-medium"><%= number_with_delimiter(@miles_saved) %> Miles saved</span>
+        </div>
+      </div>
+    </div>
+    <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full"></div>
+  </section>
+
+  <%# Monthly Volume Chart %>
+  <section class="space-y-4">
+    <h2 class="text-lg font-bold px-1 text-slate-900">Waste & Recycling Trends</h2>
+
+    <div class="bg-white p-5 rounded-xl border border-slate-100 shadow-sm">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <p class="text-sm font-medium text-slate-500">Monthly Volume</p>
+          <p class="text-2xl font-bold text-slate-900"><%= @current_month_volume %> kg</p>
+        </div>
+        <span class="text-xs font-semibold text-[#ec5b13] bg-[#ec5b13]/10 px-2 py-1 rounded">Last 30 days</span>
+      </div>
+      <div class="flex items-end justify-between h-32 px-2">
+        <% max_vol = [@monthly_data.values.max || 1, 1].max %>
+        <% @monthly_data.each_with_index do |(month, volume), idx| %>
+          <% height_pct = (volume / max_vol.to_f * 100).round %>
+          <% is_current = idx == @monthly_data.size - 1 %>
+          <div class="w-8 bg-slate-100 rounded-t-lg relative group" style="height: 100%;">
+            <div class="absolute bottom-0 w-full <%= is_current ? 'bg-[#ec5b13]' : 'bg-[#ec5b13]/40' %> rounded-t-lg transition-all" style="height: <%= height_pct %>%"></div>
+            <p class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] <%= is_current ? 'text-[#ec5b13] font-bold' : 'text-slate-400 font-bold' %> uppercase"><%= month %></p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Category Breakdown %>
+    <div class="bg-white p-5 rounded-xl border border-slate-100 shadow-sm">
+      <p class="text-sm font-medium text-slate-500 mb-4">Recycling Distribution</p>
+      <div class="space-y-4">
+        <div class="space-y-1.5">
+          <div class="flex justify-between text-xs font-semibold">
+            <span class="text-slate-700">Paper & Cardboard</span>
+            <span class="text-slate-700">45%</span>
+          </div>
+          <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+            <div class="bg-blue-500 h-full rounded-full" style="width: 45%"></div>
+          </div>
+        </div>
+        <div class="space-y-1.5">
+          <div class="flex justify-between text-xs font-semibold">
+            <span class="text-slate-700">Plastics</span>
+            <span class="text-slate-700">30%</span>
+          </div>
+          <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+            <div class="bg-[#ec5b13] h-full rounded-full" style="width: 30%"></div>
+          </div>
+        </div>
+        <div class="space-y-1.5">
+          <div class="flex justify-between text-xs font-semibold">
+            <span class="text-slate-700">Compost</span>
+            <span class="text-slate-700">25%</span>
+          </div>
+          <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+            <div class="bg-orange-400 h-full rounded-full" style="width: 25%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <%# Badges Section %>
+  <% if @badges.any? %>
+    <section class="bg-white p-5 rounded-xl border border-slate-100 shadow-sm">
+      <h3 class="text-sm font-bold mb-4 text-slate-900">Earned Badges</h3>
+      <div class="grid grid-cols-3 gap-3">
+        <% @badges.each do |badge| %>
+          <div class="flex flex-col items-center text-center p-3 rounded-xl bg-[#ec5b13]/5 border border-[#ec5b13]/10">
+            <span class="material-symbols-outlined text-[#ec5b13] text-2xl mb-1"><%= badge.icon || "emoji_events" %></span>
+            <p class="text-xs font-bold text-slate-900"><%= badge.name %></p>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <%# Reduction Goals %>
+  <section class="bg-white p-5 rounded-xl border border-slate-100 shadow-sm">
+    <h3 class="text-sm font-bold mb-4 text-slate-900">Reduction Goals</h3>
+    <div class="flex items-center gap-4">
+      <div class="flex-1">
+        <div class="flex justify-between items-center mb-1">
+          <span class="text-xs font-medium text-slate-700">Eco Score Progress</span>
+          <span class="text-xs font-bold text-[#ec5b13]"><%= @eco_score %>%</span>
+        </div>
+        <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+          <div class="bg-[#ec5b13] h-full rounded-full" style="width: <%= @eco_score %>%"></div>
+        </div>
+      </div>
+      <div class="bg-[#ec5b13]/10 text-[#ec5b13] p-2 rounded-lg">
+        <span class="material-symbols-outlined text-sm">emoji_events</span>
+      </div>
+    </div>
+    <p class="mt-3 text-[11px] text-slate-500">
+      <% if @eco_score >= 80 %>
+        Amazing progress! You're in the top tier of eco-conscious users.
+      <% elsif @eco_score >= 50 %>
+        You're on track! Keep recycling and composting to boost your score.
+      <% else %>
+        Get started by scheduling regular pickups to improve your eco score.
+      <% end %>
+    </p>
+  </section>
+</div>

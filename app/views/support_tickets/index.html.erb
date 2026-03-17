@@ -1,0 +1,76 @@
+<%# Support Tickets %>
+<% content_for(:page_title) { "Support Tickets" } %>
+
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">Support Tickets</h1>
+      <p class="mt-1 text-slate-500 text-sm">Track and manage your reported issues.</p>
+    </div>
+    <%= link_to new_support_ticket_path, class: "inline-flex items-center gap-2 px-4 py-2.5 bg-[#ec5b13] text-white rounded-xl font-bold text-sm shadow-lg shadow-[#ec5b13]/20 hover:brightness-110 transition-all" do %>
+      <span class="material-symbols-outlined text-lg">add</span>
+      Report Issue
+    <% end %>
+  </div>
+
+  <% if @tickets.any? %>
+    <div class="space-y-3">
+      <% @tickets.each do |ticket| %>
+        <%
+          icon_bg = case ticket.category
+                    when 'Missed Pickup' then 'bg-[#ec5b13]/20 text-[#ec5b13]'
+                    when 'Damaged Bin' then 'bg-orange-100 text-orange-600'
+                    when 'Incomplete Collection' then 'bg-yellow-100 text-yellow-600'
+                    when 'Spillage' then 'bg-purple-100 text-purple-600'
+                    else 'bg-slate-100 text-slate-600'
+                    end
+          icon_name = case ticket.category
+                      when 'Missed Pickup' then 'delete_sweep'
+                      when 'Damaged Bin' then 'delete_sweep'
+                      when 'Incomplete Collection' then 'warning'
+                      when 'Spillage' then 'water_drop'
+                      else 'help'
+                      end
+          status_class = case ticket.status
+                         when 'submitted' then 'bg-yellow-100 text-yellow-700'
+                         when 'under_review' then 'bg-[#ec5b13]/10 text-[#ec5b13]'
+                         when 'resolved' then 'bg-green-100 text-green-700'
+                         else 'bg-slate-100 text-slate-600'
+                         end
+        %>
+        <%= link_to support_ticket_path(ticket), class: "block bg-white rounded-xl border border-slate-100 shadow-sm p-5 hover:border-[#ec5b13]/30 hover:shadow-md transition-all" do %>
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-start gap-4">
+              <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 <%= icon_bg %>">
+                <span class="material-symbols-outlined"><%= icon_name %></span>
+              </div>
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="text-xs font-mono text-slate-400"><%= ticket.ticket_number %></span>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider <%= status_class %>">
+                    <%= ticket.status.titleize %>
+                  </span>
+                </div>
+                <p class="font-bold text-slate-900"><%= ticket.category %></p>
+                <p class="text-sm text-slate-500 mt-1 line-clamp-1"><%= ticket.description %></p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-slate-400 whitespace-nowrap"><%= time_ago_in_words(ticket.created_at) %> ago</span>
+              <span class="material-symbols-outlined text-slate-300">chevron_right</span>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-12 text-center">
+      <div class="w-16 h-16 mx-auto flex items-center justify-center rounded-full bg-green-100 text-green-600 mb-4">
+        <span class="material-symbols-outlined text-3xl">check_circle</span>
+      </div>
+      <h3 class="text-lg font-bold text-slate-900 mb-2">No Tickets</h3>
+      <p class="text-sm text-slate-500 mb-6">You haven't reported any issues yet. If you experience a problem, let us know!</p>
+      <%= link_to "Report an Issue", new_support_ticket_path, class: "inline-flex items-center gap-2 px-5 py-2.5 bg-[#ec5b13] text-white rounded-xl font-bold text-sm hover:brightness-110 transition-all" %>
+    </div>
+  <% end %>
+</div>

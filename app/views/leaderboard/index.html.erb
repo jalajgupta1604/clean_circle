@@ -1,0 +1,178 @@
+<%# Community Leaderboard %>
+<% content_for(:page_title) { "Leaderboard" } %>
+
+<div class="space-y-6">
+  <%# User Status Card %>
+  <section class="bg-[#ec5b13]/10 rounded-xl p-6 border border-[#ec5b13]/20 flex flex-col items-center text-center">
+    <div class="relative mb-4">
+      <div class="w-24 h-24 rounded-full bg-[#ec5b13] text-white flex items-center justify-center text-3xl font-extrabold border-4 border-[#ec5b13] shadow-lg">
+        <%= current_user.name&.first&.upcase %>
+      </div>
+      <div class="absolute -bottom-2 -right-2 bg-[#ec5b13] text-white text-xs font-bold px-2 py-1 rounded-full border-2 border-[#f8f6f6]">
+        LVL <%= @current_rank %>
+      </div>
+    </div>
+    <h2 class="text-2xl font-bold text-slate-900">Rank #<%= @current_rank %></h2>
+    <div class="flex items-center gap-1 text-[#ec5b13] font-semibold mt-1">
+      <span class="material-symbols-outlined text-sm">energy_savings_leaf</span>
+      <span><%= @reward_points %> pts</span>
+    </div>
+    <% if @total_households > 0 %>
+      <p class="text-sm text-slate-500 mt-2">
+        <% percentile = ((1 - (@current_rank.to_f / @total_households)) * 100).round(0) %>
+        Top <%= [percentile, 1].max %>% in <span class="font-medium text-slate-900">your community</span>
+      </p>
+    <% end %>
+  </section>
+
+  <%# Tabs %>
+  <div class="flex border-b border-slate-200">
+    <button class="flex-1 py-3 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-[#ec5b13] transition-colors">
+      Top Neighborhoods
+    </button>
+    <button class="flex-1 py-3 text-sm font-bold border-b-2 border-[#ec5b13] text-[#ec5b13]">
+      Top Households
+    </button>
+  </div>
+
+  <%# Stats Row %>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <%# CO2 Saved %>
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
+          <span class="material-symbols-outlined">eco</span>
+        </div>
+        <h2 class="text-lg font-bold text-slate-900">CO2 Saved</h2>
+      </div>
+      <p class="text-3xl font-extrabold text-slate-900"><%= @co2_saved %> kg</p>
+      <p class="text-sm text-slate-500 mt-1">Estimated carbon offset</p>
+    </div>
+
+    <%# Monthly Goal %>
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center">
+          <span class="material-symbols-outlined">trending_up</span>
+        </div>
+        <h2 class="text-lg font-bold text-slate-900">Monthly Goal</h2>
+      </div>
+      <% goal = 8 %>
+      <% progress = [(@pickups_this_month.to_f / goal * 100).round(0), 100].min %>
+      <p class="text-3xl font-extrabold text-slate-900"><%= @pickups_this_month %>/<%= goal %></p>
+      <p class="text-sm text-slate-500 mt-1 mb-3">Pickups this month</p>
+      <div class="w-full bg-slate-200 rounded-full h-2.5">
+        <div class="bg-[#ec5b13] h-2.5 rounded-full transition-all" style="width: <%= progress %>%"></div>
+      </div>
+      <p class="text-xs text-slate-400 mt-1"><%= progress %>% complete</p>
+    </div>
+
+    <%# Streak %>
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center">
+          <span class="material-symbols-outlined">local_fire_department</span>
+        </div>
+        <h2 class="text-lg font-bold text-slate-900">Current Streak</h2>
+      </div>
+      <% months_with_pickups = current_user.household&.pickups&.where(status: "completed")&.pluck(:created_at)&.map { |d| d&.beginning_of_month }&.compact&.uniq&.sort&.reverse || [] %>
+      <% streak = 0 %>
+      <% check_month = Date.current.beginning_of_month %>
+      <% months_with_pickups.each do |m| %>
+        <% if m == check_month %>
+          <% streak += 1 %>
+          <% check_month = check_month.prev_month %>
+        <% else %>
+          <% break %>
+        <% end %>
+      <% end %>
+      <p class="text-3xl font-extrabold text-slate-900"><%= streak %></p>
+      <p class="text-sm text-slate-500 mt-1">Consecutive months with pickups</p>
+    </div>
+  </div>
+
+  <%# Neighborhood Impact %>
+  <section class="space-y-3">
+    <h3 class="font-bold text-lg flex items-center gap-2 text-slate-900">
+      <span class="material-symbols-outlined text-[#ec5b13]">location_on</span>
+      Neighborhood Impact
+    </h3>
+    <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
+      <div class="flex justify-between items-center mb-3">
+        <span class="text-sm font-medium text-slate-700">Community Collective</span>
+        <span class="text-[#ec5b13] font-bold">-<%= @co2_saved %> kg CO2</span>
+      </div>
+      <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+        <div class="bg-[#ec5b13] h-full rounded-full" style="width: <%= [(@completed_pickups.to_f / 20 * 100).round(0), 100].min %>%"></div>
+      </div>
+      <p class="text-[10px] text-slate-400 mt-2 uppercase tracking-widest font-bold"><%= @total_households %> households participating</p>
+    </div>
+  </section>
+
+  <%# Top Households %>
+  <section class="space-y-4">
+    <h3 class="font-bold text-lg text-slate-900">Top Households</h3>
+
+    <% if @top_households.any? %>
+      <div class="space-y-2">
+        <% @top_households.each_with_index do |household, idx| %>
+          <% rank = idx + 1 %>
+          <% is_mine = current_user.household&.id == household.id %>
+          <div class="flex items-center gap-4 bg-white p-3 rounded-xl border border-slate-100 shadow-sm
+            <%= is_mine ? 'ring-2 ring-[#ec5b13] bg-[#ec5b13]/5' : '' %>">
+            <div class="w-8 text-center font-bold <%= rank <= 3 ? 'text-[#ec5b13]' : 'text-slate-400' %>"><%= rank %></div>
+            <div class="w-10 h-10 rounded-full bg-[#ec5b13]/10 text-[#ec5b13] flex items-center justify-center font-bold text-sm">
+              <%= household.address&.first&.upcase || "H" %>
+            </div>
+            <div class="flex-1">
+              <p class="font-bold text-sm text-slate-900"><%= household.address || "Household ##{household.id}" %></p>
+              <div class="flex gap-1 mt-1">
+                <span class="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium">Score: <%= household.top_eco_score.to_i %></span>
+                <% if is_mine %>
+                  <span class="text-[10px] bg-[#ec5b13]/10 text-[#ec5b13] px-1.5 py-0.5 rounded font-medium">You</span>
+                <% end %>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="font-bold text-sm text-slate-900"><%= household.total_points.to_i %></p>
+              <p class="text-[10px] text-slate-400 uppercase">Points</p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="bg-white rounded-xl border border-slate-200 p-12 text-center">
+        <span class="material-symbols-outlined text-4xl text-slate-300 mb-4">leaderboard</span>
+        <p class="text-slate-500">No households ranked yet.</p>
+      </div>
+    <% end %>
+  </section>
+
+  <%# Monthly Challenge %>
+  <section class="bg-[#ec5b13] rounded-xl p-6 text-white shadow-lg overflow-hidden relative">
+    <div class="relative z-10">
+      <div class="flex justify-between items-start mb-4">
+        <div>
+          <span class="text-[10px] uppercase font-bold tracking-widest bg-white/20 px-2 py-0.5 rounded">Monthly Challenge</span>
+          <h3 class="text-xl font-bold mt-2">Zero Waste Week</h3>
+        </div>
+        <span class="material-symbols-outlined text-3xl">emoji_events</span>
+      </div>
+      <p class="text-sm text-white/90 mb-4">Complete all scheduled pickups for 7 consecutive days. Earn 500 bonus points and an exclusive badge!</p>
+      <div class="flex items-center gap-4 mb-4">
+        <div class="flex items-center gap-1.5 text-sm text-white/90 font-medium">
+          <span class="material-symbols-outlined text-lg">military_tech</span>
+          500 bonus points
+        </div>
+        <div class="flex items-center gap-1.5 text-sm text-white/90 font-medium">
+          <span class="material-symbols-outlined text-lg">shield</span>
+          Exclusive badge
+        </div>
+      </div>
+      <button class="w-full bg-white text-[#ec5b13] font-bold py-3 rounded-xl hover:bg-slate-100 transition-colors">
+        Join Challenge
+      </button>
+    </div>
+    <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+  </section>
+</div>

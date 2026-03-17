@@ -1,90 +1,82 @@
-<% content_for(:title, "Dashboard - CleanCircle Agent") %>
+<% content_for(:title, "Home - CleanCircle Collector") %>
 
-<div class="mb-6">
-  <h1 class="text-xl font-bold text-gray-900">Welcome, <%= current_user.name %></h1>
-  <p class="text-sm text-gray-500 mt-1"><%= Date.current.strftime("%A, %B %d, %Y") %></p>
-</div>
+<%# Profile Greeting %>
+<section class="p-6">
+  <h1 class="text-3xl font-bold tracking-tight">Hello, <%= current_user.name.split(' ').first %>!</h1>
+  <p class="text-slate-600 mt-1"><%= @pending_today %> service points remaining for today.</p>
+</section>
 
-<%# Start Route button %>
+<%# Completed / Remaining stat cards %>
+<section class="grid grid-cols-2 gap-4 px-4">
+  <div class="flex flex-col gap-2 rounded-xl p-5 bg-white border border-[#ec5b13]/10 shadow-sm">
+    <div class="flex items-center gap-2 text-[#ec5b13]">
+      <span class="material-symbols-outlined text-sm">check_circle</span>
+      <p class="text-slate-500 text-xs font-semibold uppercase">Completed</p>
+    </div>
+    <p class="text-3xl font-bold leading-tight"><%= @completed_today %></p>
+  </div>
+  <div class="flex flex-col gap-2 rounded-xl p-5 bg-white border border-[#ec5b13]/10 shadow-sm">
+    <div class="flex items-center gap-2 text-[#ec5b13]">
+      <span class="material-symbols-outlined text-sm">pending_actions</span>
+      <p class="text-slate-500 text-xs font-semibold uppercase">Remaining</p>
+    </div>
+    <p class="text-3xl font-bold leading-tight"><%= @pending_today %></p>
+  </div>
+</section>
+
+<%# Route Summary Hero Card %>
 <% if @routes.any? %>
-  <%= link_to agent_route_path(@routes.first),
-    class: "flex items-center justify-center w-full bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold py-4 rounded-xl shadow-md transition mb-6" do %>
-    <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-    Start Route
-  <% end %>
+  <section class="mt-6 px-4">
+    <div class="relative overflow-hidden rounded-2xl bg-[#ec5b13] p-6 text-white shadow-lg shadow-[#ec5b13]/20">
+      <div class="relative z-10">
+        <h3 class="text-xl font-bold">Today's Route Summary</h3>
+        <p class="mt-1 text-white/80 text-sm">
+          <%= @routes.first.name %> &middot; <%= @routes.first.area %>
+        </p>
+        <%= link_to agent_route_path(@routes.first), class: "mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-4 text-base font-bold text-[#ec5b13] transition-transform active:scale-95" do %>
+          <span class="material-symbols-outlined">navigation</span>
+          Start Today's Route
+        <% end %>
+      </div>
+      <div class="absolute -right-12 -top-12 size-48 rounded-full bg-white/10"></div>
+      <div class="absolute -bottom-8 -left-8 size-32 rounded-full bg-black/5"></div>
+    </div>
+  </section>
 <% end %>
 
-<%# Pickups remaining today - prominent display %>
-<div class="bg-blue-50 border border-blue-200 rounded-xl px-5 py-4 mb-6 flex items-center justify-between">
-  <div>
-    <p class="text-sm font-medium text-blue-700 uppercase tracking-wide">Pickups Remaining Today</p>
-    <p class="text-3xl font-bold text-blue-800 mt-1"><%= @pending_today %></p>
-  </div>
-  <div class="text-right">
-    <p class="text-sm text-blue-600 font-medium"><%= @completed_today %> of <%= @total_today %> pickups completed today</p>
-    <% if @total_today > 0 %>
-      <div class="mt-2 w-40 bg-blue-200 rounded-full h-2">
-        <div class="h-2 rounded-full bg-blue-600" style="width: <%= ((@completed_today.to_f / @total_today) * 100).round %>%"></div>
-      </div>
+<%# Upcoming Stops %>
+<section class="mt-8 px-4">
+  <div class="flex items-center justify-between mb-4">
+    <h3 class="text-lg font-bold">Upcoming Stops</h3>
+    <% if @routes.any? %>
+      <%= link_to "View All", agent_route_path(@routes.first), class: "text-[#ec5b13] text-sm font-semibold" %>
     <% end %>
-  </div>
-</div>
-
-<%# Today's stats %>
-<div class="grid grid-cols-2 gap-3 sm:grid-cols-4 mb-6">
-  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Pickups</p>
-    <p class="text-2xl font-bold text-blue-700 mt-1"><%= @total_today %></p>
-  </div>
-  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Completed</p>
-    <p class="text-2xl font-bold text-green-600 mt-1"><%= @completed_today %></p>
-  </div>
-  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Pending</p>
-    <p class="text-2xl font-bold text-yellow-600 mt-1"><%= @pending_today %></p>
-  </div>
-  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Missed</p>
-    <p class="text-2xl font-bold text-red-600 mt-1"><%= @missed_today %></p>
-  </div>
-</div>
-
-<%# Assigned routes %>
-<div class="bg-white rounded-xl shadow-sm border border-gray-200">
-  <div class="px-4 py-3 border-b border-gray-200">
-    <h2 class="text-base font-semibold text-gray-900">Assigned Routes</h2>
   </div>
 
   <% if @routes.any? %>
-    <ul class="divide-y divide-gray-100">
+    <div class="space-y-3">
       <% @routes.each do |route| %>
-        <li>
-          <%= link_to agent_route_path(route), class: "block px-4 py-3 hover:bg-gray-50 transition" do %>
-            <div class="flex items-center justify-between">
-              <div class="min-w-0 flex-1">
-                <p class="text-sm font-medium text-gray-900 truncate"><%= route.name %></p>
-                <p class="text-xs text-gray-500 mt-0.5"><%= route.area %></p>
-              </div>
-              <div class="ml-4 flex-shrink-0 text-right">
-                <% completed = route.pickups.where(status: :completed, created_at: Date.current.all_day).count %>
-                <% total = route.pickups.where(created_at: Date.current.all_day).count %>
-                <% rate = total > 0 ? ((completed.to_f / total) * 100).round : 0 %>
-                <span class="text-sm font-semibold <%= rate == 100 ? 'text-green-600' : 'text-blue-700' %>"><%= rate %>%</span>
-                <p class="text-xs text-gray-400"><%= completed %>/<%= total %> done</p>
-              </div>
+        <% route.pickups.where(status: [:pending, :scheduled]).where(created_at: Date.current.all_day).limit(3).each_with_index do |pickup, idx| %>
+          <div class="flex items-center gap-4 rounded-xl bg-white p-4 border border-slate-100 shadow-sm">
+            <div class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-[#ec5b13]/10 text-[#ec5b13]">
+              <span class="material-symbols-outlined">home</span>
             </div>
-            <%# Progress bar %>
-            <div class="mt-2 w-full bg-gray-200 rounded-full h-1.5">
-              <div class="h-1.5 rounded-full <%= rate == 100 ? 'bg-green-500' : 'bg-blue-600' %>" style="width: <%= rate %>%"></div>
+            <div class="flex-1">
+              <h4 class="font-bold text-sm"><%= pickup.household&.building_name || pickup.household&.address || "Pickup ##{pickup.id}" %></h4>
+              <p class="text-xs text-slate-500"><%= pickup.waste_type&.titleize || "Mixed Waste" %></p>
             </div>
-          <% end %>
-        </li>
+            <div class="text-right">
+              <span class="text-xs font-bold <%= idx == 0 ? 'text-[#ec5b13] bg-[#ec5b13]/10' : 'text-slate-400 bg-slate-100' %> px-2 py-1 rounded-full uppercase">
+                <%= "#{(idx + 1) * 0.4} km" %>
+              </span>
+            </div>
+          </div>
+        <% end %>
       <% end %>
-    </ul>
+    </div>
   <% else %>
-    <div class="px-4 py-8 text-center text-sm text-gray-400">
+    <div class="rounded-xl bg-white p-8 text-center text-sm text-slate-400 border border-slate-100">
       No routes assigned for today.
     </div>
   <% end %>
-</div>
+</section>

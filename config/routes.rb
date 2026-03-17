@@ -46,6 +46,13 @@ Rails.application.routes.draw do
   end
   get "waste_tracking", to: "waste_tracking#index"
   get "qr_code", to: "households#qr_code"
+  get "leaderboard", to: "leaderboard#index"
+  get "eco_stats", to: "eco_stats#index"
+  resources :support_tickets, only: [:index, :new, :create, :show] do
+    member do
+      post :add_message
+    end
+  end
 
   # Agent namespace
   namespace :agent do
@@ -78,6 +85,9 @@ Rails.application.routes.draw do
       member do
         post :adjust_wallet
       end
+      collection do
+        post :bulk_update
+      end
     end
     resources :pickups, only: [:index, :show, :new, :create] do
       collection do
@@ -87,7 +97,16 @@ Rails.application.routes.draw do
     end
     resources :subscription_plans
     resources :subscriptions, only: [:index, :show]
+    resources :report_automations do
+      member do
+        post :run
+        patch :toggle_status
+      end
+    end
     get "revenue", to: "revenue#index"
     get "waste_analytics", to: "waste_analytics#index"
+    get "performance", to: "performance#index"
+    post "performance/generate_report", to: "performance#generate_report", as: :generate_report
+    get "live_map", to: "live_map#index"
   end
 end

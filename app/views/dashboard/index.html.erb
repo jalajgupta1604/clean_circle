@@ -1,217 +1,263 @@
 <%# Customer Dashboard %>
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<% content_for(:page_title) { "Household Dashboard" } %>
 
-  <%# Welcome Banner %>
-  <div class="bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-2xl p-6 sm:p-8 mb-8 text-white">
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-      <div>
-        <h1 class="text-2xl sm:text-3xl font-bold">Welcome back, <%= current_user.name %>!</h1>
-        <p class="mt-1 text-emerald-100">Here's your waste management overview for today.</p>
+<div class="space-y-6">
+  <%# Welcome & Eco Score Row %>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <%# Eco Score Gauge %>
+    <div class="col-span-1 md:col-span-2 lg:col-span-1 bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
+      <h3 class="text-slate-500 font-semibold mb-4">Eco Score</h3>
+      <div class="relative flex items-center justify-center w-32 h-32">
+        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 128 128">
+          <circle cx="64" cy="64" r="52" stroke="#e2e8f0" stroke-width="10" fill="none"/>
+          <circle cx="64" cy="64" r="52" stroke="#ec5b13" stroke-width="10" fill="none"
+                  stroke-dasharray="<%= (2 * Math::PI * 52).round(1) %>"
+                  stroke-dashoffset="<%= ((1 - @eco_score / 100.0) * 2 * Math::PI * 52).round(1) %>"
+                  stroke-linecap="round"/>
+        </svg>
+        <div class="absolute inset-0 flex flex-col items-center justify-center">
+          <span class="text-3xl font-black text-slate-900"><%= @eco_score %></span>
+          <span class="text-[10px] uppercase font-bold text-slate-400"><%= @eco_badge %></span>
+        </div>
       </div>
-      <div class="flex gap-3">
-        <%= link_to wallet_path, class: "inline-flex items-center px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-sm font-medium transition-colors" do %>
-          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-          Recharge Wallet
-        <% end %>
-        <% if current_user.household %>
-          <%= link_to qr_code_path, class: "inline-flex items-center px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-sm font-medium transition-colors" do %>
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
-            View QR Code
-          <% end %>
-        <% end %>
+      <p class="mt-4 text-xs font-medium text-emerald-500 flex items-center gap-1">
+        <span class="material-symbols-outlined text-sm">trending_up</span> +5.2% from last month
+      </p>
+    </div>
+
+    <%# Total Waste Volume Card %>
+    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+      <div class="flex justify-between items-start mb-4">
+        <div class="p-2 bg-blue-100 text-blue-600 rounded-lg">
+          <span class="material-symbols-outlined">restore_from_trash</span>
+        </div>
+        <span class="text-xs font-bold text-slate-400 px-2 py-1 bg-slate-100 rounded">THIS MONTH</span>
       </div>
+      <h3 class="text-slate-500 text-sm font-medium">Total Waste Volume</h3>
+      <p class="text-3xl font-bold mt-1 text-slate-900"><%= @monthly_waste %> <span class="text-sm font-normal text-slate-400">L</span></p>
+      <div class="mt-4 h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+        <div class="h-full bg-blue-500" style="width: 65%;"></div>
+      </div>
+      <p class="text-[10px] mt-2 text-slate-400 uppercase font-bold tracking-tighter">65% OF MONTHLY TARGET</p>
+    </div>
+
+    <%# Landfill Diversion Card %>
+    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+      <div class="flex justify-between items-start mb-4">
+        <div class="p-2 bg-emerald-100 text-emerald-600 rounded-lg">
+          <span class="material-symbols-outlined">eco</span>
+        </div>
+        <span class="text-xs font-bold text-slate-400 px-2 py-1 bg-slate-100 rounded">REDUCTION</span>
+      </div>
+      <h3 class="text-slate-500 text-sm font-medium">Landfill Diversion</h3>
+      <p class="text-3xl font-bold mt-1 text-slate-900"><%= [@eco_score + 10, 100].min %> <span class="text-sm font-normal text-slate-400">%</span></p>
+      <div class="flex gap-1 mt-4 h-8 items-end">
+        <div class="flex-1 bg-emerald-200 h-[40%] rounded-t-sm"></div>
+        <div class="flex-1 bg-emerald-200 h-[60%] rounded-t-sm"></div>
+        <div class="flex-1 bg-emerald-200 h-[55%] rounded-t-sm"></div>
+        <div class="flex-1 bg-emerald-200 h-[75%] rounded-t-sm"></div>
+        <div class="flex-1 bg-[#ec5b13] h-[90%] rounded-t-sm"></div>
+      </div>
+    </div>
+
+    <%# Sustainability Badges Card %>
+    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+      <h3 class="text-slate-500 text-sm font-medium mb-4">Sustainability Badges</h3>
+      <div class="grid grid-cols-3 gap-2">
+        <div class="aspect-square bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center" title="Compost Champion">
+          <span class="material-symbols-outlined">potted_plant</span>
+        </div>
+        <div class="aspect-square bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center" title="Zero Waste Week">
+          <span class="material-symbols-outlined">verified</span>
+        </div>
+        <div class="aspect-square bg-[#ec5b13]/10 text-[#ec5b13] rounded-lg flex items-center justify-center" title="Plastics Reducer">
+          <span class="material-symbols-outlined">water_bottle</span>
+        </div>
+        <div class="aspect-square border-2 border-dashed border-slate-200 rounded-lg flex items-center justify-center text-slate-300">
+          <span class="material-symbols-outlined">lock</span>
+        </div>
+        <div class="aspect-square border-2 border-dashed border-slate-200 rounded-lg flex items-center justify-center text-slate-300">
+          <span class="material-symbols-outlined">lock</span>
+        </div>
+        <div class="aspect-square border-2 border-dashed border-slate-200 rounded-lg flex items-center justify-center text-slate-300">
+          <span class="material-symbols-outlined">lock</span>
+        </div>
+      </div>
+      <%= link_to rewards_path, class: "block w-full mt-4 text-xs font-bold text-[#ec5b13] hover:underline text-center" do %>VIEW ALL ACHIEVEMENTS<% end %>
     </div>
   </div>
 
-  <%# Stats Cards %>
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-    <%# Wallet Balance %>
-    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-      <div class="flex items-center justify-between mb-4">
-        <div class="w-12 h-12 flex items-center justify-center rounded-lg bg-emerald-100 text-emerald-600">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-        </div>
-        <%= link_to "Recharge", wallet_path, class: "text-sm text-emerald-600 hover:text-emerald-700 font-medium" %>
+  <%# Quick Stats Row %>
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+    <div class="bg-white rounded-xl border border-[#ec5b13]/5 p-4 shadow-sm">
+      <div class="flex items-center gap-2 mb-1">
+        <span class="material-symbols-outlined text-[#ec5b13] text-xl">account_balance_wallet</span>
+        <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Balance</p>
       </div>
-      <p class="text-sm font-medium text-gray-500">Wallet Balance</p>
-      <p class="text-2xl font-bold text-gray-900 mt-1">&#8377;<%= @wallet_balance %></p>
+      <p class="text-2xl font-bold text-slate-900">&#8377;<%= @wallet_balance %></p>
     </div>
-
-    <%# Active Plan %>
-    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-      <div class="flex items-center justify-between mb-4">
-        <div class="w-12 h-12 flex items-center justify-center rounded-lg bg-blue-100 text-blue-600">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
-        </div>
-        <%= link_to "Manage", subscriptions_path, class: "text-sm text-emerald-600 hover:text-emerald-700 font-medium" %>
+    <div class="bg-white rounded-xl border border-[#ec5b13]/5 p-4 shadow-sm">
+      <div class="flex items-center gap-2 mb-1">
+        <span class="material-symbols-outlined text-blue-600 text-xl">card_membership</span>
+        <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Plan</p>
       </div>
-      <p class="text-sm font-medium text-gray-500">Active Plan</p>
-      <p class="text-2xl font-bold text-gray-900 mt-1"><%= @subscription&.subscription_plan&.name || "None" %></p>
+      <p class="text-2xl font-bold text-slate-900"><%= @subscription&.subscription_plan&.name || "None" %></p>
     </div>
-
-    <%# Total Pickups %>
-    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-      <div class="flex items-center justify-between mb-4">
-        <div class="w-12 h-12 flex items-center justify-center rounded-lg bg-amber-100 text-amber-600">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
-        </div>
-        <%= link_to "View All", pickups_path, class: "text-sm text-emerald-600 hover:text-emerald-700 font-medium" %>
+    <div class="bg-white rounded-xl border border-[#ec5b13]/5 p-4 shadow-sm">
+      <div class="flex items-center gap-2 mb-1">
+        <span class="material-symbols-outlined text-green-600 text-xl">local_shipping</span>
+        <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Pickups</p>
       </div>
-      <p class="text-sm font-medium text-gray-500">Total Pickups</p>
-      <p class="text-2xl font-bold text-gray-900 mt-1"><%= @total_pickups %></p>
+      <p class="text-2xl font-bold text-slate-900"><%= @total_pickups %></p>
     </div>
-
-    <%# Monthly Waste %>
-    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-      <div class="flex items-center justify-between mb-4">
-        <div class="w-12 h-12 flex items-center justify-center rounded-lg bg-purple-100 text-purple-600">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-        </div>
-        <%= link_to "Track", waste_tracking_path, class: "text-sm text-emerald-600 hover:text-emerald-700 font-medium" %>
+    <div class="bg-white rounded-xl border border-[#ec5b13]/5 p-4 shadow-sm">
+      <div class="flex items-center gap-2 mb-1">
+        <span class="material-symbols-outlined text-purple-600 text-xl">delete_sweep</span>
+        <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Waste</p>
       </div>
-      <p class="text-sm font-medium text-gray-500">This Month Waste</p>
-      <p class="text-2xl font-bold text-gray-900 mt-1"><%= @monthly_waste %> L</p>
+      <p class="text-2xl font-bold text-slate-900"><%= @monthly_waste %> <span class="text-sm font-normal text-slate-400">L</span></p>
     </div>
   </div>
 
-  <%# Rewards & Eco Score Widget %>
-  <div class="bg-gradient-to-r from-teal-50 to-emerald-50 rounded-xl border border-emerald-200 p-6 shadow-sm mb-8">
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-      <div class="flex items-center gap-5">
-        <%# Mini Eco Score Circle %>
-        <div class="relative w-16 h-16 shrink-0">
-          <svg class="w-16 h-16 transform -rotate-90" viewBox="0 0 120 120">
-            <circle cx="60" cy="60" r="52" stroke="#d1d5db" stroke-width="10" fill="none"/>
-            <circle cx="60" cy="60" r="52" stroke="#059669" stroke-width="10" fill="none"
-                    stroke-dasharray="<%= (2 * Math::PI * 52).round(1) %>"
-                    stroke-dashoffset="<%= ((1 - @eco_score / 100.0) * 2 * Math::PI * 52).round(1) %>"
-                    stroke-linecap="round"/>
-          </svg>
-          <div class="absolute inset-0 flex items-center justify-center">
-            <span class="text-sm font-bold text-gray-900"><%= @eco_score %></span>
-          </div>
-        </div>
+  <%# Main Content: Trends + Recent Pickups %>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <%# Waste Volume Trends %>
+    <div class="lg:col-span-2 bg-white p-8 rounded-xl border border-slate-200 shadow-sm">
+      <div class="flex items-center justify-between mb-8">
         <div>
-          <div class="flex items-center gap-2 mb-1">
-            <h3 class="font-bold text-gray-900">Eco Score</h3>
-            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700"><%= @eco_badge %></span>
+          <h3 class="text-xl font-bold text-slate-900">Waste Volume Trends</h3>
+          <p class="text-slate-400 text-sm">Comparison between Recycling, Compost, and Landfill</p>
+        </div>
+        <%= link_to waste_tracking_path, class: "text-sm text-[#ec5b13] font-bold hover:underline" do %>View Details<% end %>
+      </div>
+      <div class="h-64 flex items-end gap-4 px-2">
+        <% months = %w[Jan Feb Mar Apr May Jun] %>
+        <% heights = [40, 60, 55, 75, 65, 50] %>
+        <% months.each_with_index do |month, i| %>
+          <div class="flex-1 flex flex-col items-center gap-2">
+            <div class="w-full flex flex-col justify-end h-full gap-0.5">
+              <div class="w-full bg-blue-400 rounded-t-sm" style="height: <%= heights[i] - 10 %>%"></div>
+              <div class="w-full bg-green-400" style="height: <%= heights[i] / 3 %>%"></div>
+              <div class="w-full bg-slate-300" style="height: <%= 100 - heights[i] - heights[i]/3 %>%"></div>
+            </div>
+            <span class="text-xs font-medium text-slate-400"><%= month %></span>
           </div>
-          <p class="text-sm text-gray-500">
-            <span class="font-semibold text-amber-600"><%= @reward_points %></span> reward points available
-          </p>
+        <% end %>
+      </div>
+      <div class="mt-8 flex flex-wrap gap-6 border-t border-slate-100 pt-6">
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 bg-blue-400 rounded-full"></div>
+          <span class="text-sm font-medium text-slate-600">Recycling</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+          <span class="text-sm font-medium text-slate-600">Compost</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 bg-slate-300 rounded-full"></div>
+          <span class="text-sm font-medium text-slate-600">Landfill</span>
         </div>
       </div>
-      <%= link_to rewards_path, class: "inline-flex items-center px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors" do %>
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        View Rewards
-      <% end %>
+    </div>
+
+    <%# Local Ranking %>
+    <div class="bg-white p-8 rounded-xl border border-slate-200 shadow-sm flex flex-col">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xl font-bold text-slate-900">Local Ranking</h3>
+        <span class="text-xs font-bold text-[#ec5b13]">YOUR AREA</span>
+      </div>
+      <div class="space-y-4 flex-1">
+        <%# Rank entries %>
+        <div class="flex items-center gap-4 p-3 rounded-lg bg-slate-50">
+          <span class="text-amber-500 font-black italic">#1</span>
+          <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xs font-bold">M</div>
+          <div class="flex-1">
+            <p class="text-sm font-bold text-slate-900">Top Household</p>
+            <p class="text-[10px] text-slate-400">98 Score</p>
+          </div>
+          <div class="text-emerald-500"><span class="material-symbols-outlined text-sm">expand_less</span></div>
+        </div>
+        <div class="flex items-center gap-4 p-3 rounded-lg">
+          <span class="text-slate-400 font-black italic">#2</span>
+          <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-xs font-bold">J</div>
+          <div class="flex-1">
+            <p class="text-sm font-bold text-slate-900">Runner Up</p>
+            <p class="text-[10px] text-slate-400">92 Score</p>
+          </div>
+          <div class="text-slate-400"><span class="material-symbols-outlined text-sm">remove</span></div>
+        </div>
+        <div class="flex items-center gap-4 p-3 rounded-lg ring-2 ring-[#ec5b13] bg-[#ec5b13]/5">
+          <span class="text-[#ec5b13] font-black italic">#3</span>
+          <div class="w-8 h-8 rounded-full bg-[#ec5b13] text-white flex items-center justify-center text-xs font-bold"><%= current_user.name&.first&.upcase %></div>
+          <div class="flex-1">
+            <p class="text-sm font-bold text-slate-900">You (<%= current_user.name&.split(' ')&.first %>)</p>
+            <p class="text-[10px] text-[#ec5b13]"><%= @eco_score %> Score</p>
+          </div>
+          <div class="text-emerald-500"><span class="material-symbols-outlined text-sm">expand_less</span></div>
+        </div>
+      </div>
+      <%= link_to leaderboard_path, class: "w-full mt-6 py-2 border border-slate-200 text-sm font-bold rounded-lg hover:bg-slate-50 transition-colors text-center block" do %>FULL LEADERBOARD<% end %>
     </div>
   </div>
 
-  <%# Quick Actions & Recent Pickups %>
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-    <%# Recent Pickups %>
-    <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm">
-      <div class="flex items-center justify-between p-6 border-b border-gray-100">
-        <h2 class="text-lg font-bold text-gray-900">Recent Pickups</h2>
-        <%= link_to "View All", pickups_path, class: "text-sm text-emerald-600 hover:text-emerald-700 font-medium" %>
-      </div>
-
-      <% if @recent_pickups.present? %>
-        <div class="divide-y divide-gray-100">
-          <% @recent_pickups.each do |pickup| %>
-            <div class="flex items-center justify-between p-4 sm:p-6 hover:bg-gray-50 transition-colors">
-              <div class="flex items-center gap-4">
-                <div class="w-10 h-10 flex items-center justify-center rounded-full
-                  <%= case pickup.status
-                      when 'completed' then 'bg-green-100 text-green-600'
-                      when 'scheduled' then 'bg-blue-100 text-blue-600'
-                      when 'in_progress' then 'bg-yellow-100 text-yellow-600'
-                      when 'missed' then 'bg-red-100 text-red-600'
-                      when 'cancelled' then 'bg-gray-100 text-gray-600'
-                      end %>">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
-                </div>
-                <div>
-                  <p class="font-medium text-gray-900"><%= pickup.created_at.strftime("%b %d, %Y") %></p>
-                  <p class="text-sm text-gray-500"><%= pickup.estimated_volume %> L estimated</p>
-                </div>
-              </div>
-              <div class="flex items-center gap-3">
-                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold
-                  <%= case pickup.status
-                      when 'completed' then 'bg-green-100 text-green-700'
-                      when 'scheduled' then 'bg-blue-100 text-blue-700'
-                      when 'in_progress' then 'bg-yellow-100 text-yellow-700'
-                      when 'missed' then 'bg-red-100 text-red-700'
-                      when 'cancelled' then 'bg-gray-100 text-gray-700'
-                      end %>">
-                  <%= pickup.status.titleize %>
-                </span>
-                <%= link_to pickup_path(pickup), class: "text-gray-400 hover:text-gray-600" do %>
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                <% end %>
-              </div>
-            </div>
-          <% end %>
-        </div>
-      <% else %>
-        <div class="p-12 text-center">
-          <svg class="w-12 h-12 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
-          <p class="text-gray-500">No pickups yet. Your first pickup will appear here.</p>
-        </div>
-      <% end %>
+  <%# Recent Pickups Table %>
+  <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="px-8 py-6 border-b border-slate-200 flex justify-between items-center">
+      <h3 class="text-xl font-bold text-slate-900">Recent Pickup History</h3>
+      <%= link_to "Download Report", pickups_path, class: "text-sm text-[#ec5b13] font-bold hover:underline" %>
     </div>
 
-    <%# Quick Actions %>
-    <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
-      <div class="p-6 border-b border-gray-100">
-        <h2 class="text-lg font-bold text-gray-900">Quick Actions</h2>
+    <% if @recent_pickups.present? %>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left">
+          <thead class="bg-slate-50">
+            <tr>
+              <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Date</th>
+              <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Service</th>
+              <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Volume</th>
+              <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Eco Status</th>
+              <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Points</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <% @recent_pickups.each do |pickup| %>
+              <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="window.location='<%= pickup_path(pickup) %>'">
+                <td class="px-8 py-4 text-sm font-medium text-slate-900"><%= pickup.created_at.strftime("%b %d, %Y") %></td>
+                <td class="px-8 py-4">
+                  <span class="flex items-center gap-2 text-sm text-slate-700">
+                    <span class="w-2 h-2 rounded-full
+                      <%= case pickup.status
+                          when 'completed' then 'bg-green-500'
+                          when 'scheduled' then 'bg-blue-500'
+                          when 'missed' then 'bg-red-500'
+                          else 'bg-slate-400'
+                          end %>"></span>
+                    Pickup
+                  </span>
+                </td>
+                <td class="px-8 py-4 text-sm text-slate-700"><%= pickup.estimated_volume %> L</td>
+                <td class="px-8 py-4">
+                  <span class="px-2 py-1 text-[10px] font-bold rounded uppercase
+                    <%= case pickup.status
+                        when 'completed' then 'bg-emerald-100 text-emerald-600'
+                        when 'scheduled' then 'bg-blue-100 text-blue-600'
+                        when 'missed' then 'bg-amber-100 text-amber-600'
+                        else 'bg-slate-100 text-slate-600'
+                        end %>">
+                    <%= pickup.status.titleize %>
+                  </span>
+                </td>
+                <td class="px-8 py-4 font-bold text-[#ec5b13]"><%= pickup.completed? ? "+#{(pickup.estimated_volume.to_f * 10).round(0)}" : "--" %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
       </div>
-      <div class="p-6 space-y-3">
-        <%= link_to wallet_path, class: "flex items-center gap-4 p-4 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 transition-colors group" do %>
-          <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-emerald-600 text-white group-hover:bg-emerald-700 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-          </div>
-          <div>
-            <p class="font-semibold">Recharge Wallet</p>
-            <p class="text-sm text-emerald-600">Add funds to your wallet</p>
-          </div>
-        <% end %>
-
-        <% if current_user.household %>
-          <%= link_to qr_code_path, class: "flex items-center gap-4 p-4 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 transition-colors group" do %>
-            <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-blue-600 text-white group-hover:bg-blue-700 transition-colors">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
-            </div>
-            <div>
-              <p class="font-semibold">View QR Code</p>
-              <p class="text-sm text-blue-600">Show your household QR</p>
-            </div>
-          <% end %>
-        <% end %>
-
-        <%= link_to waste_tracking_path, class: "flex items-center gap-4 p-4 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 transition-colors group" do %>
-          <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-purple-600 text-white group-hover:bg-purple-700 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-          </div>
-          <div>
-            <p class="font-semibold">Track Waste</p>
-            <p class="text-sm text-purple-600">View your waste analytics</p>
-          </div>
-        <% end %>
-
-        <%= link_to subscriptions_path, class: "flex items-center gap-4 p-4 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 transition-colors group" do %>
-          <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-amber-600 text-white group-hover:bg-amber-700 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
-          </div>
-          <div>
-            <p class="font-semibold">Manage Plan</p>
-            <p class="text-sm text-amber-600">View or change subscription</p>
-          </div>
-        <% end %>
+    <% else %>
+      <div class="p-12 text-center">
+        <span class="material-symbols-outlined text-4xl text-slate-300 mb-4">local_shipping</span>
+        <p class="text-slate-500">No pickups yet. Your first pickup will appear here.</p>
       </div>
-    </div>
+    <% end %>
   </div>
 </div>

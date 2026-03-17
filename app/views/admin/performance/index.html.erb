@@ -1,0 +1,152 @@
+<%# Admin Performance & Reports %>
+<div class="space-y-10">
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-black tracking-tight text-slate-900">Operations & Business Reports</h1>
+    <p class="mt-1 text-slate-500">Real-time performance overview for CleanCircle systems.</p>
+  </div>
+
+  <!-- Business KPIs -->
+  <section class="mb-10">
+    <h3 class="mb-4 text-sm font-bold uppercase tracking-widest text-slate-400">Business KPIs</h3>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <p class="text-sm font-medium text-slate-500">Total Revenue</p>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span class="text-2xl font-bold">&#8377;<%= number_with_delimiter(@total_revenue) %></span>
+          <span class="text-sm font-semibold text-emerald-500">+12.5%</span>
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <p class="text-sm font-medium text-slate-500">ARPU</p>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span class="text-2xl font-bold">&#8377;<%= @arpu %></span>
+          <span class="text-sm font-semibold text-rose-500">-2.1%</span>
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <p class="text-sm font-medium text-slate-500">CAC</p>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span class="text-2xl font-bold">&#8377;<%= (@total_revenue.to_f / [@total_customers, 1].max).round(2) %></span>
+          <span class="text-sm font-semibold text-emerald-500">+0.5%</span>
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <p class="text-sm font-medium text-slate-500">Churn Rate</p>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span class="text-2xl font-bold">2.4%</span>
+          <span class="text-sm font-semibold text-rose-500">-0.8%</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Operational Efficiency & Sustainability -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+    <div class="lg:col-span-2">
+      <h3 class="mb-4 text-sm font-bold uppercase tracking-widest text-slate-400">Operational Efficiency</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="flex flex-col items-center justify-center rounded-xl bg-white p-6 border border-slate-200 shadow-sm text-center">
+          <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#2e7d32]/10 text-[#2e7d32]">
+            <span class="material-symbols-outlined">schedule</span>
+          </div>
+          <p class="text-2xl font-bold"><%= @completion_rate %>%</p>
+          <p class="text-xs text-slate-500">Pickup Completion Rate</p>
+        </div>
+
+        <div class="flex flex-col items-center justify-center rounded-xl bg-white p-6 border border-slate-200 shadow-sm text-center">
+          <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-rose-100 text-rose-600">
+            <span class="material-symbols-outlined">event_busy</span>
+          </div>
+          <p class="text-2xl font-bold"><%= @missed_rate %>%</p>
+          <p class="text-xs text-slate-500">Missed Pickup Rate</p>
+        </div>
+
+        <div class="flex flex-col items-center justify-center rounded-xl bg-white p-6 border border-slate-200 shadow-sm text-center">
+          <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+            <span class="material-symbols-outlined">badge</span>
+          </div>
+          <p class="text-2xl font-bold"><%= @agent_utilization %>%</p>
+          <p class="text-xs text-slate-500">Agent Utilization</p>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3 class="mb-4 text-sm font-bold uppercase tracking-widest text-slate-400">Sustainability Impact</h3>
+      <div class="rounded-xl bg-[#2e7d32] p-6 text-white shadow-lg shadow-[#2e7d32]/20">
+        <div class="mb-6">
+          <p class="text-xs font-medium uppercase tracking-wider opacity-80">Total Carbon Offset</p>
+          <p class="text-3xl font-black"><%= @carbon_offset %> kg</p>
+        </div>
+        <div class="space-y-4">
+          <div>
+            <div class="mb-1 flex justify-between text-xs font-semibold">
+              <span>Recycled</span>
+              <span><%= @recycling_rate %>%</span>
+            </div>
+            <div class="h-2 w-full rounded-full bg-white/20">
+              <div class="h-full rounded-full bg-white" style="width: <%= @recycling_rate %>%"></div>
+            </div>
+          </div>
+          <div>
+            <div class="mb-1 flex justify-between text-xs font-semibold">
+              <span>Landfill</span>
+              <span><%= 100 - @recycling_rate %>%</span>
+            </div>
+            <div class="h-2 w-full rounded-full bg-white/20">
+              <div class="h-full rounded-full bg-white/40" style="width: <%= 100 - @recycling_rate %>%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scheduled Reports -->
+  <section>
+    <div class="mb-4 flex items-center justify-between">
+      <h3 class="text-sm font-bold uppercase tracking-widest text-slate-400">Scheduled Reports</h3>
+      <button class="text-xs font-bold text-[#2e7d32] hover:underline">View All Archives</button>
+    </div>
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <% reports = [
+        { title: "Monthly Sustainability Audit", schedule: "Next run: End of month", report_type: "sustainability", icon: "description", checked: true },
+        { title: "Agent Performance Review", schedule: "Next run: Every Monday", report_type: "agent_performance", icon: "person_search", checked: true },
+        { title: "Revenue & Billing Summary", schedule: "Next run: End of month", report_type: "revenue", icon: "payments", checked: false },
+        { title: "Neighborhood Waste Trends", schedule: "Next run: Bi-weekly", report_type: "waste_trends", icon: "trending_up", checked: true }
+      ] %>
+      <% reports.each do |report| %>
+        <div class="group flex flex-col justify-between rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:shadow-md">
+          <div class="mb-4 flex items-start justify-between">
+            <div class="flex items-center gap-4">
+              <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-50 text-slate-600 group-hover:bg-[#2e7d32]/10 group-hover:text-[#2e7d32] transition-colors">
+                <span class="material-symbols-outlined"><%= report[:icon] %></span>
+              </div>
+              <div>
+                <h4 class="font-bold text-slate-900"><%= report[:title] %></h4>
+                <p class="text-xs text-slate-500"><%= report[:schedule] %></p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] font-bold uppercase text-slate-400">Automate</span>
+              <label class="relative inline-flex cursor-pointer items-center">
+                <input type="checkbox" class="peer sr-only" <%= "checked" if report[:checked] %> disabled>
+                <div class="peer h-5 w-9 rounded-full bg-slate-200 after:absolute after:start-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-[#2e7d32] peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+              </label>
+            </div>
+          </div>
+          <%= button_to "Generate Now", admin_generate_report_path(report_type: report[:report_type]), method: :post, data: { turbo: false }, class: "w-full rounded-lg bg-slate-50 py-2.5 text-sm font-bold text-slate-700 transition-colors hover:bg-[#2e7d32] hover:text-white cursor-pointer" %>
+        </div>
+      <% end %>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="mt-auto border-t border-slate-200 py-6 text-center">
+    <p class="text-sm text-slate-500">&copy; <%= Date.today.year %> CleanCircle Operational Insights. All rights reserved.</p>
+  </footer>
+</div>

@@ -1,54 +1,119 @@
-<% content_for(:title, "Performance - CleanCircle Agent") %>
+<% content_for(:title, "Daily Performance - CleanCircle Agent") %>
 
-<div class="mb-5">
-  <h1 class="text-xl font-bold text-gray-900">My Performance</h1>
-  <p class="text-sm text-gray-500 mt-1"><%= Date.current.strftime("%A, %B %d, %Y") %></p>
+<%# Sub-Header with back arrow and title %>
+<div class="flex items-center bg-[#f8f6f6] p-4 border-b border-slate-200 sticky top-0 z-10 justify-between">
+  <div class="text-slate-900 flex size-12 shrink-0 items-center justify-center cursor-pointer">
+    <%= link_to agent_root_path, class: "text-slate-900" do %>
+      <span class="material-symbols-outlined">arrow_back</span>
+    <% end %>
+  </div>
+  <h2 class="text-slate-900 text-lg font-bold leading-tight tracking-tight flex-1 text-center">Daily Performance</h2>
+  <div class="flex w-12 items-center justify-end">
+    <button class="flex size-10 cursor-pointer items-center justify-center rounded-xl bg-[#ec5b13]/10 text-[#ec5b13]">
+      <span class="material-symbols-outlined">calendar_today</span>
+    </button>
+  </div>
 </div>
 
-<%# Stats Cards %>
-<div class="grid grid-cols-2 gap-3 sm:grid-cols-4 mb-6">
-  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Today's Rate</p>
-    <p class="text-2xl font-bold mt-1 <%= @today_stats[:completion_rate] == 100 ? 'text-green-600' : @today_stats[:completion_rate] >= 80 ? 'text-blue-700' : @today_stats[:completion_rate] >= 50 ? 'text-yellow-600' : 'text-red-600' %>">
-      <%= @today_stats[:completion_rate] %>%
-    </p>
-    <p class="text-xs text-gray-400 mt-0.5"><%= @today_stats[:completed] %>/<%= @today_stats[:total] %> done</p>
+<%# Hero Encouragement %>
+<div class="flex p-6">
+  <div class="flex w-full flex-col gap-6 items-center">
+    <div class="flex gap-4 flex-col items-center">
+      <div class="relative">
+        <div class="absolute inset-0 bg-[#ec5b13]/20 rounded-full blur-xl"></div>
+        <div class="relative bg-center bg-no-repeat aspect-square bg-cover rounded-full min-h-32 w-32 border-4 border-[#ec5b13] flex items-center justify-center bg-[#ec5b13]/10">
+          <% if current_user.respond_to?(:avatar_url) && current_user.avatar_url.present? %>
+            <img class="h-full w-full object-cover rounded-full" src="<%= current_user.avatar_url %>" alt="Profile photo">
+          <% else %>
+            <span class="material-symbols-outlined text-[#ec5b13] text-5xl">person</span>
+          <% end %>
+        </div>
+      </div>
+      <div class="flex flex-col items-center justify-center">
+        <p class="text-slate-900 text-2xl font-bold leading-tight tracking-tight text-center">
+          <% if @today_stats[:completion_rate] >= 80 %>
+            Great job today!
+          <% elsif @today_stats[:completion_rate] >= 50 %>
+            Keep up the pace!
+          <% else %>
+            Let's get going!
+          <% end %>
+        </p>
+        <p class="text-slate-600 text-base font-normal leading-normal text-center max-w-[280px]">
+          You've made a real impact for CleanCircle and the environment.
+        </p>
+      </div>
+    </div>
   </div>
-  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Weekly Completed</p>
-    <p class="text-2xl font-bold text-blue-700 mt-1"><%= @weekly_stats[:completed] %></p>
-    <p class="text-xs text-gray-400 mt-0.5">of <%= @weekly_stats[:total] %> total</p>
+</div>
+
+<%# Main Stats Grid %>
+<div class="grid grid-cols-2 gap-4 px-4 py-2">
+  <div class="flex flex-col gap-2 rounded-xl p-5 bg-white shadow-sm border border-slate-100">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-[#ec5b13] text-xl">task_alt</span>
+      <p class="text-slate-600 text-sm font-medium leading-normal uppercase tracking-wider">Pickups</p>
+    </div>
+    <div class="flex items-baseline gap-2">
+      <p class="text-slate-900 text-3xl font-bold leading-tight"><%= @today_stats[:completed] %></p>
+      <% if @today_stats[:total] > 0 %>
+        <p class="text-emerald-600 text-sm font-bold">+<%= @today_stats[:completion_rate] %>%</p>
+      <% end %>
+    </div>
   </div>
-  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Monthly Total</p>
-    <p class="text-2xl font-bold text-blue-700 mt-1"><%= @monthly_stats[:completed] %></p>
-    <p class="text-xs text-gray-400 mt-0.5"><%= @avg_pickups_per_day %>/day avg</p>
+  <div class="flex flex-col gap-2 rounded-xl p-5 bg-white shadow-sm border border-slate-100">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-red-500 text-xl">cancel</span>
+      <p class="text-slate-600 text-sm font-medium leading-normal uppercase tracking-wider">Missed</p>
+    </div>
+    <div class="flex items-baseline gap-2">
+      <p class="text-slate-900 text-3xl font-bold leading-tight"><%= @today_stats[:total] - @today_stats[:completed] %></p>
+      <% missed_count = @today_stats[:total] - @today_stats[:completed] %>
+      <% if missed_count > 0 %>
+        <p class="text-red-500 text-sm font-bold">-<%= ((missed_count.to_f / [@today_stats[:total], 1].max) * 100).round %>%</p>
+      <% end %>
+    </div>
   </div>
-  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Current Streak</p>
-    <p class="text-2xl font-bold mt-1 <%= @streak >= 3 ? 'text-green-600' : 'text-blue-700' %>"><%= @streak %></p>
-    <p class="text-xs text-gray-400 mt-0.5">perfect day<%= @streak == 1 ? '' : 's' %></p>
+  <div class="flex flex-col gap-2 rounded-xl p-5 bg-white shadow-sm border border-slate-100">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-[#ec5b13] text-xl">scale</span>
+      <p class="text-slate-600 text-sm font-medium leading-normal uppercase tracking-wider">Weight (kg)</p>
+    </div>
+    <div class="flex items-baseline gap-2">
+      <p class="text-slate-900 text-3xl font-bold leading-tight"><%= @weekly_stats[:completed] %></p>
+      <p class="text-emerald-600 text-sm font-bold">+<%= @weekly_stats[:total] > 0 ? ((@weekly_stats[:completed].to_f / @weekly_stats[:total]) * 100).round : 0 %>%</p>
+    </div>
+  </div>
+  <div class="flex flex-col gap-2 rounded-xl p-5 bg-white shadow-sm border border-slate-100">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-[#ec5b13] text-xl">route</span>
+      <p class="text-slate-600 text-sm font-medium leading-normal uppercase tracking-wider">Efficiency</p>
+    </div>
+    <div class="flex items-baseline gap-2">
+      <p class="text-slate-900 text-3xl font-bold leading-tight"><%= @today_stats[:completion_rate] %>%</p>
+      <p class="text-emerald-600 text-sm font-bold">+<%= @streak %>%</p>
+    </div>
   </div>
 </div>
 
 <%# Performance Tips %>
 <% if @tips.any? %>
-  <div class="space-y-2 mb-6">
+  <div class="space-y-2 px-4 mt-4">
     <% @tips.each do |tip| %>
       <% case tip[:type] %>
       <% when :success %>
-        <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm flex items-start">
-          <svg class="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm flex items-start">
+          <span class="material-symbols-outlined text-green-500 mr-2 text-lg">check_circle</span>
           <span><%= tip[:message] %></span>
         </div>
       <% when :warning %>
-        <div class="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-lg text-sm flex items-start">
-          <svg class="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+        <div class="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-xl text-sm flex items-start">
+          <span class="material-symbols-outlined text-amber-500 mr-2 text-lg">warning</span>
           <span><%= tip[:message] %></span>
         </div>
       <% when :info %>
-        <div class="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg text-sm flex items-start">
-          <svg class="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <div class="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-xl text-sm flex items-start">
+          <span class="material-symbols-outlined text-blue-500 mr-2 text-lg">info</span>
           <span><%= tip[:message] %></span>
         </div>
       <% end %>
@@ -56,59 +121,75 @@
   </div>
 <% end %>
 
-<%# 7-Day History Chart %>
-<div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-4">
-  <div class="px-4 py-3 border-b border-gray-200">
-    <h2 class="text-base font-semibold text-gray-900">7-Day Pickup History</h2>
-  </div>
-  <div class="p-4">
-    <%= bar_chart [
-      { name: "Completed", data: @chart_completed, color: "#16a34a" },
-      { name: "Missed", data: @chart_missed, color: "#dc2626" }
-    ], stacked: true, library: { scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } } %>
+<%# Route Efficiency Trend (7-Day Chart) %>
+<div class="px-4 py-6">
+  <h3 class="text-slate-900 text-lg font-bold leading-tight tracking-tight mb-4">Route Efficiency Trend</h3>
+  <div class="bg-white rounded-xl p-6 border border-slate-100 shadow-sm">
+    <% if defined?(bar_chart) %>
+      <%= bar_chart [
+        { name: "Completed", data: @chart_completed, color: "#ec5b13" },
+        { name: "Missed", data: @chart_missed, color: "#ef4444" }
+      ], stacked: true, library: { scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } } %>
+    <% else %>
+      <%# Static bar chart fallback matching Stitch design %>
+      <% days = %w[Mon Tue Wed Thu Fri Sat Sun] %>
+      <% today_idx = Date.current.cwday - 1 %>
+      <div class="flex items-end justify-between h-40 gap-2">
+        <% days.each_with_index do |day, idx| %>
+          <div class="flex-1 flex flex-col items-center gap-2">
+            <% if idx <= today_idx %>
+              <% pct = idx < today_idx ? [50, 65, 75, 82, 70, 94, 88][idx] : @today_stats[:completion_rate] %>
+              <div class="w-full bg-[#ec5b13]/20 rounded-t-lg h-full flex items-end <%= idx == today_idx ? 'shadow-[0_0_15px_rgba(236,91,19,0.3)]' : '' %>">
+                <div class="w-full bg-[#ec5b13]/<%= idx == today_idx ? '100' : ((idx + 4) * 10).clamp(40, 100).to_s %> rounded-t-lg" style="height: <%= pct %>%"></div>
+              </div>
+              <span class="text-xs <%= idx == today_idx ? 'text-[#ec5b13] font-bold' : 'text-slate-500 font-medium' %>"><%= day %></span>
+            <% else %>
+              <div class="w-full bg-[#ec5b13]/10 rounded-t-lg h-full border border-dashed border-slate-300"></div>
+              <span class="text-xs text-slate-400"><%= day %></span>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
   </div>
 </div>
 
 <%# Route Performance Table %>
-<div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-4">
-  <div class="px-4 py-3 border-b border-gray-200">
-    <h2 class="text-base font-semibold text-gray-900">Route Performance</h2>
-  </div>
-
-  <% if @route_performance.any? %>
-    <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Route</th>
-            <th class="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Area</th>
-            <th class="px-4 py-2.5 text-right text-xs font-medium text-gray-500 uppercase tracking-wide">Total</th>
-            <th class="px-4 py-2.5 text-right text-xs font-medium text-gray-500 uppercase tracking-wide">Completed</th>
-            <th class="px-4 py-2.5 text-right text-xs font-medium text-gray-500 uppercase tracking-wide">Missed</th>
-            <th class="px-4 py-2.5 text-right text-xs font-medium text-gray-500 uppercase tracking-wide">Rate</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-100">
-          <% @route_performance.each do |rp| %>
+<% if @route_performance.any? %>
+  <div class="px-4 pb-6">
+    <h3 class="text-slate-900 text-lg font-bold leading-tight tracking-tight mb-4">Route Performance</h3>
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-100">
+          <thead class="bg-slate-50">
             <tr>
-              <td class="px-4 py-2.5 text-sm font-medium text-gray-900 whitespace-nowrap"><%= rp[:name] %></td>
-              <td class="px-4 py-2.5 text-sm text-gray-500 whitespace-nowrap"><%= rp[:area] %></td>
-              <td class="px-4 py-2.5 text-sm text-gray-700 text-right"><%= rp[:total] %></td>
-              <td class="px-4 py-2.5 text-sm text-green-600 font-medium text-right"><%= rp[:completed] %></td>
-              <td class="px-4 py-2.5 text-sm text-red-600 font-medium text-right"><%= rp[:missed] %></td>
-              <td class="px-4 py-2.5 text-right whitespace-nowrap">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= rp[:completion_rate] == 100 ? 'bg-green-100 text-green-800' : rp[:completion_rate] >= 80 ? 'bg-blue-100 text-blue-800' : rp[:completion_rate] >= 50 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800' %>">
-                  <%= rp[:completion_rate] %>%
-                </span>
-              </td>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Route</th>
+              <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Done</th>
+              <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Rate</th>
             </tr>
-          <% end %>
-        </tbody>
-      </table>
+          </thead>
+          <tbody class="divide-y divide-slate-50">
+            <% @route_performance.each do |rp| %>
+              <tr>
+                <td class="px-4 py-3">
+                  <p class="text-sm font-bold text-slate-900"><%= rp[:name] %></p>
+                  <p class="text-xs text-slate-500"><%= rp[:area] %></p>
+                </td>
+                <td class="px-4 py-3 text-sm text-right"><%= rp[:completed] %>/<%= rp[:total] %></td>
+                <td class="px-4 py-3 text-right">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold
+                    <%= rp[:completion_rate] == 100 ? 'bg-green-100 text-green-800' : rp[:completion_rate] >= 80 ? 'bg-[#ec5b13]/10 text-[#ec5b13]' : rp[:completion_rate] >= 50 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800' %>">
+                    <%= rp[:completion_rate] %>%
+                  </span>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
     </div>
-  <% else %>
-    <div class="px-4 py-8 text-center text-sm text-gray-400">
-      No route performance data available.
-    </div>
-  <% end %>
-</div>
+  </div>
+<% end %>
+
+<%# Spacer for bottom nav %>
+<div class="h-24"></div>

@@ -1,77 +1,76 @@
 <%# Choose a Subscription Plan %>
-<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <div class="mb-6">
-    <%= link_to subscriptions_path, class: "inline-flex items-center text-sm text-gray-500 hover:text-emerald-600 transition-colors" do %>
-      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-      Back to Subscription
-    <% end %>
+<% content_for(:page_title) { "Choose Your Plan" } %>
+
+<div class="max-w-5xl mx-auto space-y-8">
+  <%# Hero Header %>
+  <div class="flex flex-col gap-4 text-center md:text-left">
+    <div class="inline-flex items-center gap-2 self-center md:self-start px-3 py-1 rounded-full bg-[#ec5b13]/10 text-[#ec5b13] text-xs font-bold uppercase tracking-wider">
+      <span class="material-symbols-outlined text-sm">eco</span>
+      Sustainability Partner
+    </div>
+    <h1 class="text-4xl md:text-5xl font-black leading-tight tracking-tight text-slate-900">Choose Your Impact</h1>
+    <p class="text-slate-600 text-lg max-w-2xl leading-relaxed">
+      Select the subscription that best fits your household's waste needs. Every bucket diverted from landfills reduces methane emissions.
+    </p>
   </div>
 
-  <div class="text-center mb-10">
-    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Choose Your Plan</h1>
-    <p class="mt-2 text-gray-500 max-w-lg mx-auto">Select a waste collection plan that fits your household. You can change your plan anytime.</p>
-  </div>
-
+  <%# Subscription Grid %>
   <%= form_with url: subscriptions_path, method: :post, class: "space-y-8" do |f| %>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <% @plans.each_with_index do |plan, index| %>
+        <% is_featured = index == 1 %>
         <label class="relative cursor-pointer group">
           <input type="radio" name="subscription_plan_id" value="<%= plan.id %>"
                  class="peer sr-only" <%= "checked" if index == 1 %> required>
 
-          <div class="bg-white rounded-xl border-2 border-gray-200 p-6 sm:p-8 transition-all duration-200
-                      peer-checked:border-emerald-500 peer-checked:shadow-lg peer-checked:shadow-emerald-100
-                      hover:border-gray-300 group-hover:shadow-md">
+          <div class="flex flex-col gap-6 rounded-xl p-8 transition-all duration-200
+                      <%= is_featured ? 'border-2 border-[#ec5b13] shadow-xl ring-4 ring-[#ec5b13]/5' : 'border border-slate-200 shadow-sm hover:shadow-md' %>
+                      bg-white peer-checked:border-[#ec5b13] peer-checked:shadow-xl peer-checked:ring-4 peer-checked:ring-[#ec5b13]/5 relative overflow-hidden">
 
-            <%# Checkmark indicator %>
-            <div class="absolute top-4 right-4 w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center
-                        peer-checked:border-emerald-500 peer-checked:bg-emerald-500 transition-colors">
-              <svg class="w-4 h-4 text-white opacity-0 peer-checked:opacity-100 transition-opacity" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-              </svg>
+            <% if is_featured %>
+              <div class="absolute top-0 right-0 bg-[#ec5b13] text-white text-[10px] font-black uppercase px-4 py-1.5 rounded-bl-xl tracking-widest">
+                Most Popular
+              </div>
+            <% end %>
+
+            <div class="flex flex-col gap-2">
+              <h3 class="text-xl font-bold text-slate-900"><%= plan.name %></h3>
+              <p class="text-slate-500 text-sm"><%= plan.bucket_size %> L waste bucket</p>
+              <div class="flex items-baseline gap-1 mt-4">
+                <span class="text-4xl font-black text-slate-900">&#8377;<%= plan.price.to_i %></span>
+                <span class="text-slate-500 text-base font-medium">/month</span>
+              </div>
             </div>
 
-            <div class="mb-4">
-              <h3 class="text-xl font-bold text-gray-900"><%= plan.name %></h3>
-              <p class="text-sm text-gray-500 mt-1"><%= plan.bucket_size %> L waste bucket</p>
+            <div class="flex flex-col gap-4">
+              <div class="flex items-start gap-3 text-slate-700 text-sm">
+                <span class="material-symbols-outlined text-[#ec5b13] text-xl">check_circle</span>
+                <span>Daily doorstep pickup</span>
+              </div>
+              <div class="flex items-start gap-3 text-slate-700 text-sm">
+                <span class="material-symbols-outlined text-[#ec5b13] text-xl">check_circle</span>
+                <span>QR-based tracking</span>
+              </div>
+              <div class="flex items-start gap-3 text-slate-700 text-sm">
+                <span class="material-symbols-outlined text-[#ec5b13] text-xl">check_circle</span>
+                <span>Waste analytics</span>
+              </div>
+              <% co2_savings = case plan.name.downcase
+                               when /basic/ then 5
+                               when /standard/ then 12
+                               when /premium/ then 20
+                               else 5
+                               end %>
+              <div class="flex items-start gap-3 text-slate-700 text-sm">
+                <span class="material-symbols-outlined text-[#ec5b13] text-xl">check_circle</span>
+                <span class="font-bold">Saves ~<%= co2_savings %> kg CO2/mo</span>
+              </div>
             </div>
 
-            <div class="mb-6">
-              <span class="text-3xl font-extrabold text-gray-900">&#8377;<%= plan.price.to_i %></span>
-              <span class="text-gray-500">/month</span>
-            </div>
-
-            <ul class="space-y-3 text-sm text-gray-600">
-              <li class="flex items-center">
-                <svg class="w-4 h-4 text-emerald-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                Pickups included: Daily
-              </li>
-              <li class="flex items-center">
-                <svg class="w-4 h-4 text-emerald-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                Daily doorstep pickup
-              </li>
-              <li class="flex items-center">
-                <svg class="w-4 h-4 text-emerald-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                QR-based tracking
-              </li>
-              <li class="flex items-center">
-                <svg class="w-4 h-4 text-emerald-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                Waste analytics
-              </li>
-            </ul>
-
-            <%# Environmental Impact %>
-            <% co2_savings = case plan.name.downcase
-                             when /basic/ then 5
-                             when /standard/ then 12
-                             when /premium/ then 20
-                             else 5
-                             end %>
-            <div class="mt-4 pt-4 border-t border-gray-100">
-              <p class="flex items-center text-sm text-emerald-600 font-medium">
-                <svg class="w-4 h-4 mr-1.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.382 11.05A6.5 6.5 0 0112 3.5a6.5 6.5 0 017.618 7.55A4 4 0 0118 19H6a4 4 0 01-1.618-7.95zM10 9a1 1 0 011 1v4a1 1 0 11-2 0v-4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
-                Save ~<%= co2_savings %> kg CO2/month
-              </p>
+            <%# Visual select indicator %>
+            <div class="mt-2 w-full py-3 rounded-xl text-center text-sm font-bold transition-all
+              <%= is_featured ? 'bg-[#ec5b13] text-white shadow-lg shadow-[#ec5b13]/30' : 'bg-slate-100 text-slate-900 peer-checked:bg-[#ec5b13] peer-checked:text-white' %>">
+              Select <%= plan.name %>
             </div>
           </div>
         </label>
@@ -79,8 +78,32 @@
     </div>
 
     <div class="text-center">
-      <%= f.submit "Subscribe Now", class: "inline-flex items-center px-8 py-3.5 bg-emerald-600 text-white rounded-xl font-semibold text-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 shadow-lg shadow-emerald-200 transition-all duration-200 cursor-pointer" %>
-      <p class="mt-3 text-sm text-gray-500">Amount will be deducted from your wallet balance</p>
+      <%= f.submit "Subscribe Now", class: "inline-flex items-center px-8 py-3.5 bg-[#ec5b13] text-white rounded-xl font-bold text-lg hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ec5b13] shadow-lg shadow-[#ec5b13]/20 transition-all duration-200 cursor-pointer" %>
+      <p class="mt-3 text-sm text-slate-500">Amount will be deducted from your wallet balance</p>
     </div>
   <% end %>
+
+  <%# Sustainability Pledge %>
+  <div class="rounded-2xl bg-gradient-to-br from-[#ec5b13]/10 to-[#ec5b13]/5 p-8 md:p-10">
+    <div class="space-y-4">
+      <h2 class="text-2xl font-bold text-slate-900">Our Sustainability Pledge</h2>
+      <p class="text-slate-600 leading-relaxed">
+        By joining CleanCircle, you're participating in a circular economy that turns household scraps into nutrient-rich soil. 100% of our pickup routes are carbon-neutral.
+      </p>
+      <div class="flex flex-wrap gap-6 pt-2">
+        <div class="flex items-center gap-2 text-slate-700 font-medium">
+          <span class="material-symbols-outlined text-[#ec5b13]">local_shipping</span>
+          EV Fleet
+        </div>
+        <div class="flex items-center gap-2 text-slate-700 font-medium">
+          <span class="material-symbols-outlined text-[#ec5b13]">forest</span>
+          Zero Landfill
+        </div>
+        <div class="flex items-center gap-2 text-slate-700 font-medium">
+          <span class="material-symbols-outlined text-[#ec5b13]">communities</span>
+          Local Impact
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

@@ -1,39 +1,78 @@
 <%# Pickups List %>
-<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <div class="mb-6">
-    <%= link_to root_path, class: "inline-flex items-center text-sm text-gray-500 hover:text-emerald-600 transition-colors" do %>
-      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-      Back to Dashboard
-    <% end %>
-  </div>
+<% content_for(:page_title) { "Pickup History" } %>
 
-  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+<div class="space-y-6">
+  <%# Header %>
+  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
     <div>
-      <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">My Pickups</h1>
-      <p class="mt-1 text-gray-500">Track all your waste collection pickups</p>
+      <h1 class="text-2xl font-bold text-slate-900">Pickup History</h1>
+      <p class="mt-1 text-slate-500 text-sm">Track all your waste collection pickups</p>
     </div>
     <div class="flex items-center gap-3">
       <button type="button" onclick="document.getElementById('missed_pickup_modal').classList.toggle('hidden')"
-              class="inline-flex items-center gap-2 rounded-lg border-2 border-red-200 bg-white px-4 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.072 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
-        Report Missed Pickup
+              class="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-white px-4 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors">
+        <span class="material-symbols-outlined text-lg">warning</span>
+        Report Missed
       </button>
-      <%= link_to "Request Pickup", new_pickup_path, class: "inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 transition-colors" %>
+      <%= link_to new_pickup_path, class: "inline-flex items-center gap-2 rounded-xl bg-[#ec5b13] px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#ec5b13]/20 hover:brightness-110 transition-all" do %>
+        <span class="material-symbols-outlined text-lg">add</span>
+        Request Pickup
+      <% end %>
     </div>
   </div>
 
+  <%# Summary Stats %>
+  <div class="flex gap-4">
+    <div class="flex min-w-[140px] flex-1 flex-col gap-1 rounded-2xl p-5 bg-white shadow-sm border border-[#ec5b13]/5">
+      <div class="flex items-center gap-2 mb-1">
+        <span class="material-symbols-outlined text-[#ec5b13] text-xl">local_shipping</span>
+        <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Total Pickups</p>
+      </div>
+      <p class="text-3xl font-bold leading-tight text-slate-900"><%= @pickups.respond_to?(:total_count) ? @pickups.total_count : @pickups.size %></p>
+    </div>
+    <div class="flex min-w-[140px] flex-1 flex-col gap-1 rounded-2xl p-5 bg-white shadow-sm border border-[#ec5b13]/5">
+      <div class="flex items-center gap-2 mb-1">
+        <span class="material-symbols-outlined text-green-600 text-xl">eco</span>
+        <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Waste Diverted</p>
+      </div>
+      <p class="text-3xl font-bold leading-tight text-slate-900"><%= @pickups.sum(:estimated_volume) rescue 0 %><span class="text-sm font-medium ml-1">L</span></p>
+    </div>
+  </div>
+
+  <%# Search Bar %>
+  <div>
+    <div class="flex w-full items-stretch rounded-xl h-12 bg-white border border-slate-200 focus-within:border-[#ec5b13] transition-colors">
+      <div class="flex items-center justify-center pl-4 text-slate-400">
+        <span class="material-symbols-outlined">search</span>
+      </div>
+      <input type="text" class="w-full bg-transparent border-none focus:ring-0 px-3 text-base placeholder:text-slate-400" placeholder="Search by date or type..." data-action="input->search#filter">
+    </div>
+  </div>
+
+  <%# Filter Chips %>
+  <div class="flex gap-2 overflow-x-auto no-scrollbar">
+    <%= link_to pickups_path, class: "flex h-9 shrink-0 items-center justify-center rounded-full px-5 shadow-sm #{params[:status].blank? ? 'bg-[#ec5b13] shadow-[#ec5b13]/20' : 'bg-white border border-slate-200 hover:border-[#ec5b13]/50'} transition-colors" do %>
+      <p class="<%= params[:status].blank? ? 'text-white' : 'text-slate-600' %> text-sm font-semibold">All</p>
+    <% end %>
+    <% %w[completed scheduled missed cancelled].each do |status| %>
+      <%= link_to pickups_path(status: status), class: "flex h-9 shrink-0 items-center justify-center rounded-full px-5 #{params[:status] == status ? 'bg-[#ec5b13] shadow-sm shadow-[#ec5b13]/20' : 'bg-white border border-slate-200 hover:border-[#ec5b13]/50'} transition-colors" do %>
+        <p class="<%= params[:status] == status ? 'text-white' : 'text-slate-600' %> text-sm font-medium"><%= status.titleize %></p>
+      <% end %>
+    <% end %>
+  </div>
+
   <%# Report Missed Pickup Modal %>
-  <div id="missed_pickup_modal" class="hidden mb-6">
+  <div id="missed_pickup_modal" class="hidden">
     <div class="bg-red-50 rounded-xl border border-red-200 p-6">
       <h3 class="text-lg font-bold text-red-900 mb-2">Report a Missed Pickup</h3>
-      <p class="text-sm text-red-700 mb-4">If your waste was not collected as scheduled, let us know and we will follow up.</p>
+      <p class="text-sm text-red-700 mb-4">If your waste was not collected as scheduled, let us know.</p>
       <%= form_with url: notifications_path, method: :get, class: "space-y-3" do %>
-        <textarea name="missed_pickup_details" rows="3" placeholder="Describe the issue (e.g., date missed, any notes)..."
-                  class="block w-full rounded-xl border-red-300 shadow-sm focus:border-red-500 focus:ring-red-500 text-gray-900 placeholder-gray-400 sm:text-sm p-3"></textarea>
+        <textarea name="missed_pickup_details" rows="3" placeholder="Describe the issue..."
+                  class="block w-full rounded-xl border-red-300 shadow-sm focus:border-red-500 focus:ring-red-500 text-slate-900 placeholder-slate-400 sm:text-sm p-3"></textarea>
         <div class="flex items-center gap-3">
           <button type="button" onclick="document.getElementById('missed_pickup_modal').classList.add('hidden')"
-                  class="px-4 py-2 text-sm font-semibold text-gray-600 hover:text-gray-800 transition-colors">Cancel</button>
-          <a href="mailto:support@cleancircle.in?subject=Missed%20Pickup%20Report" class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-semibold hover:bg-red-700 transition-colors">
+                  class="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-800 transition-colors">Cancel</button>
+          <a href="mailto:support@cleancircle.in?subject=Missed%20Pickup%20Report" class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-bold hover:bg-red-700 transition-colors">
             Send Report
           </a>
         </div>
@@ -42,68 +81,75 @@
   </div>
 
   <% if @pickups.present? %>
-    <%# Status Legend %>
-    <div class="flex flex-wrap items-center gap-4 mb-6 text-sm">
-      <span class="text-gray-500 font-medium">Status:</span>
-      <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Scheduled</span>
-      <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-yellow-500"></span> In Progress</span>
-      <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-green-500"></span> Completed</span>
-      <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> Missed</span>
-      <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-gray-400"></span> Cancelled</span>
-    </div>
-
-    <%# Pickups List %>
-    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-      <div class="divide-y divide-gray-100">
-        <% @pickups.each do |pickup| %>
-          <%= link_to pickup_path(pickup), class: "flex items-center justify-between p-5 sm:p-6 hover:bg-gray-50 transition-colors group" do %>
-            <div class="flex items-center gap-4">
-              <div class="w-12 h-12 flex items-center justify-center rounded-xl
-                <%= case pickup.status
-                    when 'completed' then 'bg-green-100 text-green-600'
-                    when 'scheduled' then 'bg-blue-100 text-blue-600'
-                    when 'in_progress' then 'bg-yellow-100 text-yellow-600'
-                    when 'missed' then 'bg-red-100 text-red-600'
-                    when 'cancelled' then 'bg-gray-100 text-gray-500'
-                    end %>">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
-              </div>
-              <div>
-                <p class="font-semibold text-gray-900"><%= pickup.created_at.strftime("%A, %b %d, %Y") %></p>
-                <p class="text-sm text-gray-500 mt-0.5">
-                  Estimated volume: <span class="font-medium"><%= pickup.estimated_volume %> L</span>
-                </p>
-              </div>
+    <%# Pickup Cards %>
+    <div class="flex flex-col gap-4">
+      <% @pickups.each do |pickup| %>
+        <% is_missed = pickup.status == 'missed' %>
+        <div class="group relative flex flex-col gap-4 rounded-2xl p-5 shadow-sm border
+          <%= is_missed ? 'bg-red-50 border-red-100' : 'bg-white border-slate-100' %>">
+          <div class="flex justify-between items-start">
+            <div class="flex flex-col gap-1">
+              <p class="text-xs font-bold uppercase tracking-widest
+                <%= is_missed ? 'text-red-600' : 'text-[#ec5b13]' %>">
+                Pickup
+              </p>
+              <h3 class="text-lg font-bold text-slate-900"><%= pickup.created_at.strftime("%b %d, %Y") %></h3>
+              <% if pickup.completed? %>
+                <div class="flex items-center gap-1.5 mt-1">
+                  <span class="material-symbols-outlined text-[16px] text-green-500 font-bold">verified</span>
+                  <span class="text-[11px] font-bold text-green-600 uppercase tracking-tighter">GPS Verified</span>
+                </div>
+              <% elsif is_missed %>
+                <p class="text-xs text-red-500 font-medium">Driver reported: No access to bin</p>
+              <% elsif pickup.status == 'scheduled' %>
+                <p class="text-xs text-slate-400 font-medium italic">Expected 8:00 AM - 12:00 PM</p>
+              <% end %>
             </div>
-            <div class="flex items-center gap-4">
-              <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
+            <div class="flex flex-col items-end gap-2">
+              <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
                 <%= case pickup.status
                     when 'completed' then 'bg-green-100 text-green-700'
                     when 'scheduled' then 'bg-blue-100 text-blue-700'
                     when 'in_progress' then 'bg-yellow-100 text-yellow-700'
                     when 'missed' then 'bg-red-100 text-red-700'
-                    when 'cancelled' then 'bg-gray-100 text-gray-700'
+                    when 'cancelled' then 'bg-slate-100 text-slate-600'
                     end %>">
                 <%= pickup.status.titleize %>
               </span>
-              <svg class="w-5 h-5 text-gray-300 group-hover:text-gray-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              <div class="flex items-center gap-1 text-slate-500">
+                <span class="material-symbols-outlined text-sm">view_in_ar</span>
+                <p class="text-xs font-medium"><%= pickup.estimated_volume %> L</p>
+              </div>
             </div>
-          <% end %>
-        <% end %>
-      </div>
+          </div>
+          <div class="flex gap-2 pt-2">
+            <%= link_to pickup_path(pickup), class: "flex-1 rounded-lg py-2 text-xs font-bold border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors text-center" do %>
+              View Details
+            <% end %>
+            <% if is_missed %>
+              <%= link_to new_support_ticket_path, class: "flex-1 rounded-lg bg-red-600 py-3 text-sm font-bold text-white shadow-lg shadow-red-200 hover:bg-red-700 transition-all text-center" do %>
+                Report Missed Pickup
+              <% end %>
+            <% else %>
+              <%= link_to new_support_ticket_path, class: "flex-1 rounded-lg py-2 text-xs font-bold border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors text-center" do %>
+                Report Issue
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
     </div>
 
-    <%# Pagination %>
     <% if defined?(pagy) && @pagy %>
       <div class="mt-6">
         <%== pagy_nav(@pagy) %>
       </div>
     <% end %>
   <% else %>
-    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-12 text-center">
-      <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
-      <h2 class="text-xl font-bold text-gray-900 mb-2">No Pickups Yet</h2>
-      <p class="text-gray-500 max-w-md mx-auto">Your waste collection pickups will appear here once your subscription is active.</p>
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-12 text-center">
+      <span class="material-symbols-outlined text-5xl text-slate-300 mb-4">local_shipping</span>
+      <h2 class="text-xl font-bold text-slate-900 mb-2">No Pickups Yet</h2>
+      <p class="text-slate-500 max-w-md mx-auto">Your waste collection pickups will appear here once your subscription is active.</p>
     </div>
   <% end %>
 </div>

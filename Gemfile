@@ -36,6 +36,9 @@ gem "phonelib"
 # Pagination
 gem "pagy", "~> 9.0"
 
+# CSV export (required explicitly in Ruby 3.4+)
+gem "csv"
+
 # Charts
 gem "chartkick"
 gem "groupdate"

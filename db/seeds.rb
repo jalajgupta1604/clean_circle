@@ -62,4 +62,7 @@ Subscription.find_or_create_by!(user: customer, subscription_plan: SubscriptionP
   s.ends_on = Date.current + 30.days
 end
 
+puts "Seeding badges..."
+Badge.seed_defaults!
+
 puts "Done!"

@@ -1,0 +1,70 @@
+<% content_for(:title, "Edit Report Automation - CleanCircle Admin") %>
+
+<div class="max-w-4xl mx-auto">
+  <div class="mb-8">
+    <%= link_to admin_report_automations_path, class: "flex items-center gap-2 text-[#2e7d32] mb-2" do %>
+      <span class="material-symbols-outlined text-sm">arrow_back</span>
+      <span class="text-xs font-bold uppercase tracking-wider">Back to Reports</span>
+    <% end %>
+    <h1 class="text-3xl font-extrabold tracking-tight">Edit Report Automation</h1>
+    <p class="text-slate-600 mt-2">Update the configuration for "<%= @report_automation.name %>".</p>
+  </div>
+
+  <%= form_with(model: [:admin, @report_automation], class: "grid grid-cols-1 gap-8") do |f| %>
+    <% if @report_automation.errors.any? %>
+      <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+        <ul class="list-disc pl-4">
+          <% @report_automation.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <section class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+      <div class="flex items-center gap-2 mb-6">
+        <span class="material-symbols-outlined text-[#2e7d32]">analytics</span>
+        <h3 class="text-lg font-bold">Report Configuration</h3>
+      </div>
+
+      <div class="mb-4">
+        <%= f.label :name, "Report Name", class: "block text-xs font-bold text-slate-500 uppercase mb-1" %>
+        <%= f.text_field :name, class: "w-full rounded-lg border-slate-200 text-sm focus:border-[#2e7d32] focus:ring-[#2e7d32]" %>
+      </div>
+
+      <div class="mb-4">
+        <%= f.label :report_type, "Report Type", class: "block text-xs font-bold text-slate-500 uppercase mb-1" %>
+        <%= f.select :report_type, ReportAutomation::REPORT_TYPES.map { |t| [t.titleize, t] }, {}, class: "w-full rounded-lg border-slate-200 text-sm focus:border-[#2e7d32] focus:ring-[#2e7d32]" %>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+          <%= f.label :schedule, "Schedule", class: "block text-xs font-bold text-slate-500 uppercase mb-1" %>
+          <%= f.select :schedule, ReportAutomation::SCHEDULES.map { |s| [s.capitalize, s] }, {}, class: "w-full rounded-lg border-slate-200 text-sm focus:border-[#2e7d32] focus:ring-[#2e7d32]" %>
+        </div>
+        <div>
+          <%= f.label :format, "Format", class: "block text-xs font-bold text-slate-500 uppercase mb-1" %>
+          <%= f.select :format, ReportAutomation::FORMATS.map { |fmt| [fmt.upcase, fmt] }, {}, class: "w-full rounded-lg border-slate-200 text-sm focus:border-[#2e7d32] focus:ring-[#2e7d32]" %>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <%= f.label :recipients, "Recipients (comma-separated emails)", class: "block text-xs font-bold text-slate-500 uppercase mb-1" %>
+        <%= f.text_area :recipients, rows: 3, class: "w-full rounded-lg border-slate-200 text-sm focus:border-[#2e7d32] focus:ring-[#2e7d32]" %>
+      </div>
+
+      <div>
+        <%= f.label :status, "Status", class: "block text-xs font-bold text-slate-500 uppercase mb-1" %>
+        <%= f.select :status, ReportAutomation::STATUSES.map { |s| [s.capitalize, s] }, {}, class: "w-full rounded-lg border-slate-200 text-sm focus:border-[#2e7d32] focus:ring-[#2e7d32]" %>
+      </div>
+    </section>
+
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-200">
+      <div class="flex items-center gap-4">
+        <%= link_to admin_report_automations_path, class: "px-8 py-3 rounded-xl border border-slate-200 text-sm font-bold hover:bg-slate-50 transition-colors" do %>Cancel<% end %>
+        <%= button_to admin_report_automation_path(@report_automation), method: :delete, class: "px-8 py-3 rounded-xl border border-red-200 text-red-600 text-sm font-bold hover:bg-red-50 transition-colors", data: { turbo_confirm: "Are you sure?" } do %>Delete<% end %>
+      </div>
+      <%= f.submit "Update Automation", class: "px-10 py-3 rounded-xl bg-[#2e7d32] text-white text-sm font-bold shadow-lg shadow-[#2e7d32]/20 hover:scale-[1.02] transition-transform cursor-pointer" %>
+    </div>
+  <% end %>
+</div>

@@ -1,158 +1,125 @@
-<%# Wallet %>
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <div class="mb-6">
-    <%= link_to root_path, class: "inline-flex items-center text-sm text-gray-500 hover:text-emerald-600 transition-colors" do %>
-      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-      Back to Dashboard
-    <% end %>
-  </div>
+<%# Wallet Dashboard %>
+<% content_for(:page_title) { "My Wallet" } %>
 
-  <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-8">My Wallet</h1>
-
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-    <%# Left Column: Balance & Recharge %>
-    <div class="lg:col-span-1 space-y-6">
-      <%# Balance Card %>
-      <div class="bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-2xl p-6 text-white shadow-lg">
-        <p class="text-sm font-medium text-emerald-200 mb-1">Current Balance</p>
-        <p class="text-4xl font-extrabold">&#8377;<%= @wallet.balance %></p>
-        <div class="mt-4 pt-4 border-t border-emerald-500/30">
-          <p class="text-xs text-emerald-200">Wallet ID: <%= @wallet.id %></p>
-        </div>
+<div class="space-y-6">
+  <%# Top Row: Balance Card + Auto-Recharge %>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <%# Balance Card %>
+    <div class="flex flex-col justify-between rounded-3xl p-8 bg-[#ec5b13] text-white shadow-xl shadow-[#ec5b13]/20 relative overflow-hidden">
+      <div class="relative z-10">
+        <p class="text-white/80 text-sm font-medium">Total Balance</p>
+        <h3 class="text-4xl font-bold mt-2">&#8377;<%= @wallet.balance %></h3>
       </div>
+      <div class="mt-8 flex gap-3 relative z-10">
+        <button type="button" onclick="document.getElementById('recharge_amount').focus()"
+                class="flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-bold text-[#ec5b13] hover:bg-slate-50 transition-colors shadow-lg">
+          <span class="material-symbols-outlined text-lg">add</span>
+          Recharge
+        </button>
+        <% if current_user.household %>
+          <%= link_to qr_code_path, class: "flex items-center justify-center gap-2 rounded-xl bg-black/10 px-6 py-3 text-sm font-bold text-white hover:bg-black/20 transition-colors" do %>
+            <span class="material-symbols-outlined text-lg">qr_code_2</span>
+            QR Code
+          <% end %>
+        <% end %>
+      </div>
+      <div class="mt-4 pt-4 border-t border-white/20 relative z-10">
+        <p class="text-xs text-white/60">Wallet ID: <%= @wallet.id %></p>
+      </div>
+      <div class="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10 blur-3xl"></div>
+      <div class="absolute -left-10 -bottom-10 h-32 w-32 rounded-full bg-black/10 blur-2xl"></div>
+    </div>
 
+    <%# Auto-Recharge + Recharge Form %>
+    <div class="flex flex-col gap-6">
       <%# Recharge Form %>
-      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-        <h2 class="text-lg font-bold text-gray-900 mb-4">Recharge Wallet</h2>
-
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
+        <h2 class="text-lg font-bold text-slate-900 mb-4">Recharge Wallet</h2>
         <%= form_with url: recharge_wallet_path, method: :post, class: "space-y-4" do |f| %>
-          <%# Preset Amounts %>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-3">Quick Amount</label>
+            <label class="block text-sm font-medium text-slate-700 mb-3">Quick Amount</label>
             <div class="grid grid-cols-3 gap-2">
               <% [200, 500, 1000].each do |amount| %>
                 <button type="button"
                         onclick="document.getElementById('recharge_amount').value = <%= amount %>"
-                        class="px-3 py-2.5 text-sm font-semibold border-2 border-gray-200 rounded-xl text-gray-700 hover:border-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 focus:border-emerald-500 focus:outline-none transition-all">
+                        class="px-3 py-2.5 text-sm font-semibold border-2 border-slate-200 rounded-xl text-slate-700 hover:border-[#ec5b13] hover:text-[#ec5b13] hover:bg-orange-50 focus:border-[#ec5b13] focus:outline-none transition-all">
                   &#8377;<%= amount %>
                 </button>
               <% end %>
             </div>
           </div>
-
-          <%# Custom Amount %>
           <div>
-            <label for="recharge_amount" class="block text-sm font-medium text-gray-700 mb-2">Amount</label>
+            <label for="recharge_amount" class="block text-sm font-medium text-slate-700 mb-2">Amount</label>
             <div class="relative">
-              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">&#8377;</span>
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-medium">&#8377;</span>
               <input type="number" name="amount" id="recharge_amount" min="50" step="1" required
                      placeholder="Enter amount"
-                     class="block w-full pl-10 pr-4 py-3 rounded-xl border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-gray-900 placeholder-gray-400 sm:text-sm">
+                     class="block w-full pl-10 pr-4 py-3 rounded-xl border-slate-300 shadow-sm focus:border-[#ec5b13] focus:ring-[#ec5b13] text-slate-900 placeholder-slate-400 sm:text-sm">
             </div>
-            <p class="mt-1.5 text-xs text-gray-500">Minimum recharge: &#8377;50</p>
+            <p class="mt-1.5 text-xs text-slate-500">Minimum recharge: &#8377;50</p>
           </div>
-
-          <%= f.submit "Recharge Now", class: "w-full py-3 px-4 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors cursor-pointer" %>
+          <%= f.submit "Recharge Now", class: "w-full py-3 px-4 bg-[#ec5b13] text-white rounded-xl font-bold hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ec5b13] transition-all cursor-pointer shadow-lg shadow-[#ec5b13]/20" %>
         <% end %>
       </div>
-    </div>
 
       <%# Auto Recharge Card %>
-      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
         <div class="flex items-center justify-between mb-3">
-          <h2 class="text-lg font-bold text-gray-900">Auto Recharge</h2>
+          <div>
+            <p class="text-base font-bold text-slate-900">Auto-Recharge</p>
+            <p class="text-slate-500 text-sm">Top up when balance is low</p>
+          </div>
           <label class="relative inline-flex items-center cursor-pointer">
             <input type="checkbox" id="auto_recharge_toggle" class="sr-only peer">
-            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+            <div class="w-12 h-7 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#ec5b13]"></div>
           </label>
-        </div>
-        <p class="text-sm text-gray-500 mb-4">Automatically recharge your wallet when balance drops below a threshold.</p>
-
-        <div class="space-y-4" id="auto_recharge_fields">
-          <div>
-            <label for="auto_recharge_threshold" class="block text-sm font-medium text-gray-700 mb-1">When balance falls below</label>
-            <div class="relative">
-              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-medium">&#8377;</span>
-              <input type="number" id="auto_recharge_threshold" value="50" min="10" step="10"
-                     class="block w-full pl-8 pr-4 py-2.5 rounded-xl border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-gray-900 sm:text-sm">
-            </div>
-          </div>
-
-          <div>
-            <label for="auto_recharge_amount" class="block text-sm font-medium text-gray-700 mb-1">Recharge amount</label>
-            <select id="auto_recharge_amount" class="block w-full rounded-xl border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-gray-900 sm:text-sm py-2.5">
-              <option value="200">&#8377;200</option>
-              <option value="500" selected>&#8377;500</option>
-              <option value="1000">&#8377;1,000</option>
-              <option value="2000">&#8377;2,000</option>
-            </select>
-          </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <%# Right Column: Transaction History %>
-    <div class="lg:col-span-2">
-      <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
-        <div class="p-6 border-b border-gray-100">
-          <h2 class="text-lg font-bold text-gray-900 mb-4">Transaction History</h2>
-          <%# Transaction Type Filter Buttons %>
-          <div class="flex items-center gap-2">
-            <%= link_to "All", wallet_path, class: "px-4 py-1.5 rounded-full text-sm font-semibold transition-colors #{params[:type].blank? ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}" %>
-            <%= link_to "Credits", wallet_path(type: "credit"), class: "px-4 py-1.5 rounded-full text-sm font-semibold transition-colors #{params[:type] == 'credit' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}" %>
-            <%= link_to "Debits", wallet_path(type: "debit"), class: "px-4 py-1.5 rounded-full text-sm font-semibold transition-colors #{params[:type] == 'debit' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}" %>
-          </div>
-        </div>
+  <%# Transaction History %>
+  <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="flex items-center justify-between px-6 sm:px-8 py-6 border-b border-slate-100">
+      <h4 class="text-lg font-bold text-slate-900">Recent Transactions</h4>
+      <div class="flex items-center gap-2">
+        <%= link_to "All", wallet_path, class: "px-4 py-1.5 rounded-full text-sm font-semibold transition-colors #{params[:type].blank? ? 'bg-[#ec5b13] text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}" %>
+        <%= link_to "Credits", wallet_path(type: "credit"), class: "px-4 py-1.5 rounded-full text-sm font-semibold transition-colors #{params[:type] == 'credit' ? 'bg-green-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}" %>
+        <%= link_to "Debits", wallet_path(type: "debit"), class: "px-4 py-1.5 rounded-full text-sm font-semibold transition-colors #{params[:type] == 'debit' ? 'bg-red-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}" %>
+      </div>
+    </div>
 
-        <% if @transactions.present? %>
-          <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
-                  <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Description</th>
-                  <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Type</th>
-                  <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-100">
-                <% @transactions.each do |txn| %>
-                  <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <%= txn.created_at.strftime("%b %d, %Y") %>
-                    </td>
-                    <td class="px-6 py-4 text-sm text-gray-900 font-medium">
-                      <%= txn.description %>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold
-                        <%= txn.transaction_type == 'credit' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' %>">
-                        <%= txn.transaction_type.capitalize %>
-                      </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-right
-                      <%= txn.transaction_type == 'credit' ? 'text-green-600' : 'text-red-600' %>">
-                      <%= txn.transaction_type == 'credit' ? '+' : '-' %>&#8377;<%= txn.amount %>
-                    </td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          </div>
-
-          <%# Pagination %>
-          <% if defined?(pagy) && @pagy %>
-            <div class="p-4 border-t border-gray-100">
-              <%== pagy_nav(@pagy) %>
+    <% if @transactions.present? %>
+      <div class="divide-y divide-slate-100">
+        <% @transactions.each do |txn| %>
+          <div class="flex items-center justify-between px-6 sm:px-8 py-5 hover:bg-slate-50 transition-colors">
+            <div class="flex items-center gap-4">
+              <div class="flex h-12 w-12 items-center justify-center rounded-2xl
+                <%= txn.transaction_type == 'credit' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600' %>">
+                <span class="material-symbols-outlined"><%= txn.transaction_type == 'credit' ? 'account_balance_wallet' : 'payments' %></span>
+              </div>
+              <div>
+                <p class="font-bold text-slate-900 text-sm"><%= txn.description %></p>
+                <p class="text-sm text-slate-500"><%= txn.created_at.strftime("%b %d, %Y") %></p>
+              </div>
             </div>
-          <% end %>
-        <% else %>
-          <div class="p-12 text-center">
-            <svg class="w-12 h-12 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-            <p class="text-gray-500">No transactions yet. Recharge your wallet to get started.</p>
+            <p class="font-bold text-sm <%= txn.transaction_type == 'credit' ? 'text-green-600' : 'text-slate-900' %>">
+              <%= txn.transaction_type == 'credit' ? '+' : '-' %>&#8377;<%= txn.amount %>
+            </p>
           </div>
         <% end %>
       </div>
-    </div>
+
+      <% if defined?(pagy) && @pagy %>
+        <div class="p-4 border-t border-slate-100">
+          <%== pagy_nav(@pagy) %>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="p-12 text-center">
+        <span class="material-symbols-outlined text-4xl text-slate-300 mb-4">account_balance_wallet</span>
+        <p class="text-slate-500">No transactions yet. Recharge your wallet to get started.</p>
+      </div>
+    <% end %>
   </div>
 </div>

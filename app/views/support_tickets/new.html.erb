@@ -1,0 +1,95 @@
+<%# Report an Issue %>
+<% content_for(:page_title) { "Report an Issue" } %>
+
+<div class="max-w-2xl mx-auto space-y-6">
+  <%# Back Link %>
+  <div>
+    <%= link_to support_tickets_path, class: "inline-flex items-center gap-1 text-sm text-slate-500 hover:text-[#ec5b13] transition-colors" do %>
+      <span class="material-symbols-outlined text-lg">arrow_back</span>
+      Back to Tickets
+    <% end %>
+  </div>
+
+  <h1 class="text-xl font-bold tracking-tight text-slate-900">Report an Issue</h1>
+
+  <%= form_with model: @ticket, url: support_tickets_path, class: "space-y-6" do |f| %>
+    <% if @ticket.errors.any? %>
+      <div class="bg-red-50 border border-red-200 rounded-xl p-4">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="material-symbols-outlined text-red-500">error</span>
+          <p class="font-medium text-red-700 text-sm">Please fix the following errors:</p>
+        </div>
+        <ul class="list-disc list-inside text-sm text-red-600">
+          <% @ticket.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%# Pickup Summary %>
+    <% if @pickups.any? %>
+      <section>
+        <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-500 mb-3">Pickup Summary</h2>
+        <div class="bg-white border border-slate-200 rounded-xl p-4 flex items-center gap-4 shadow-sm">
+          <div class="w-14 h-14 rounded-lg bg-[#ec5b13]/10 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[#ec5b13] text-3xl">recycling</span>
+          </div>
+          <div class="flex-1">
+            <label class="block text-sm font-bold text-slate-900 mb-2">Related Pickup (optional)</label>
+            <select name="support_ticket[pickup_id]" class="block w-full rounded-xl border-slate-300 shadow-sm focus:border-[#ec5b13] focus:ring-[#ec5b13] text-sm">
+              <option value="">-- Select a pickup --</option>
+              <% @pickups.each do |pickup| %>
+                <option value="<%= pickup.id %>" <%= 'selected' if @pickup&.id == pickup.id %>>
+                  #<%= pickup.id %> &mdash; <%= pickup.created_at&.strftime("%b %d, %Y") %> &mdash; <%= pickup.status.titleize %>
+                </option>
+              <% end %>
+            </select>
+          </div>
+        </div>
+      </section>
+    <% end %>
+
+    <%# Issue Selection %>
+    <section>
+      <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-500 mb-3">What went wrong?</h2>
+      <div class="grid gap-3">
+        <% categories = [
+          { name: "Missed Pickup", icon: "schedule", color: "text-red-500" },
+          { name: "Damaged Bin", icon: "delete_sweep", color: "text-orange-500" },
+          { name: "Incomplete Collection", icon: "warning", color: "text-yellow-500" },
+          { name: "Spillage", icon: "water_drop", color: "text-purple-500" },
+          { name: "Other", icon: "help", color: "text-slate-500" }
+        ] %>
+        <% categories.each do |cat| %>
+          <label class="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-white cursor-pointer hover:border-[#ec5b13]/50 transition-colors group
+            <%= @ticket.category == cat[:name] ? 'border-[#ec5b13] bg-[#ec5b13]/5' : '' %>">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined <%= cat[:color] %>"><%= cat[:icon] %></span>
+              <span class="text-sm font-medium text-slate-900"><%= cat[:name] %></span>
+            </div>
+            <input type="radio" name="support_ticket[category]" value="<%= cat[:name] %>"
+                   class="w-5 h-5 border-2 border-slate-300 text-[#ec5b13] focus:ring-[#ec5b13]"
+                   <%= 'checked' if @ticket.category == cat[:name] %>>
+          </label>
+        <% end %>
+      </div>
+    </section>
+
+    <%# Description %>
+    <section>
+      <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-500 mb-3">Details</h2>
+      <textarea name="support_ticket[description]" id="description" rows="4" required
+                placeholder="Please describe the issue in detail..."
+                class="w-full rounded-xl border-slate-200 bg-white focus:border-[#ec5b13] focus:ring-[#ec5b13] text-sm transition-all placeholder-slate-400"><%= @ticket.description %></textarea>
+    </section>
+
+    <%# Submit %>
+    <div class="pt-2">
+      <div class="flex items-center gap-4">
+        <%= f.submit "Submit Report", class: "flex-1 py-4 px-6 bg-[#ec5b13] text-white rounded-xl font-bold hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ec5b13] transition-all cursor-pointer shadow-lg shadow-[#ec5b13]/20 flex items-center justify-center gap-2" %>
+        <%= link_to "Cancel", support_tickets_path, class: "px-6 py-4 text-slate-600 font-medium text-sm hover:text-slate-800 transition-colors" %>
+      </div>
+    </div>
+  <% end %>
+</div>

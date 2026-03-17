@@ -15,6 +15,42 @@ module Admin
       @wallet = @household.user&.wallet
     end
 
+    def bulk_update
+      household_ids = params[:household_ids]
+      plan_id = params[:subscription_plan_id]
+
+      if household_ids.blank?
+        redirect_to admin_households_path, alert: "No households selected." and return
+      end
+
+      unless plan_id.present?
+        redirect_to admin_households_path, alert: "No subscription plan selected." and return
+      end
+
+      plan = SubscriptionPlan.find(plan_id)
+      households = Household.where(id: household_ids)
+      updated_count = 0
+
+      households.each do |household|
+        user = household.user
+        next unless user
+
+        active_sub = user.active_subscription
+        if active_sub
+          active_sub.update!(subscription_plan: plan)
+        else
+          user.subscriptions.create!(
+            subscription_plan: plan,
+            status: :active,
+            started_at: Time.current
+          )
+        end
+        updated_count += 1
+      end
+
+      redirect_to admin_households_path, notice: "Successfully updated #{updated_count} household(s) to the #{plan.name} plan."
+    end
+
     def adjust_wallet
       @household = Household.find(params[:id])
       wallet = @household.user&.wallet

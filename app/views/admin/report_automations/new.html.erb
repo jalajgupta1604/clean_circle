@@ -1,0 +1,105 @@
+<% content_for(:title, "Create Report Automation - CleanCircle Admin") %>
+
+<div class="max-w-4xl mx-auto">
+  <%# Back link %>
+  <div class="mb-8">
+    <%= link_to admin_report_automations_path, class: "flex items-center gap-2 text-[#2e7d32] mb-2" do %>
+      <span class="material-symbols-outlined text-sm">arrow_back</span>
+      <span class="text-xs font-bold uppercase tracking-wider">Back to Reports</span>
+    <% end %>
+    <h1 class="text-3xl font-extrabold tracking-tight">Create New Report Automation</h1>
+    <p class="text-slate-600 mt-2">Configure automated sustainability and performance metrics to be delivered directly to your team.</p>
+  </div>
+
+  <%= form_with(model: [:admin, @report_automation], class: "grid grid-cols-1 gap-8") do |f| %>
+    <% if @report_automation.errors.any? %>
+      <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+        <ul class="list-disc pl-4">
+          <% @report_automation.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%# Section 1: Report Configuration %>
+    <section class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+      <div class="flex items-center gap-2 mb-6">
+        <span class="material-symbols-outlined text-[#2e7d32]">analytics</span>
+        <h3 class="text-lg font-bold">1. Report Configuration</h3>
+      </div>
+
+      <div class="mb-4">
+        <%= f.label :name, "Report Name", class: "block text-xs font-bold text-slate-500 uppercase mb-1" %>
+        <%= f.text_field :name, class: "w-full rounded-lg border-slate-200 text-sm focus:border-[#2e7d32] focus:ring-[#2e7d32]", placeholder: "e.g., Monthly Sustainability Audit" %>
+      </div>
+
+      <p class="text-xs font-bold text-slate-500 uppercase mb-3">Report Type</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <% ReportAutomation::REPORT_TYPES.each_with_index do |rt, idx| %>
+          <% icons = { "sustainability_audit" => "forest", "agent_performance" => "group", "revenue" => "payments", "operations" => "settings" } %>
+          <label class="relative flex flex-col p-4 rounded-xl border-2 border-slate-100 cursor-pointer hover:border-[#2e7d32]/50 transition-all group has-[:checked]:border-[#2e7d32] has-[:checked]:bg-[#2e7d32]/5">
+            <%= f.radio_button :report_type, rt, class: "absolute top-4 right-4 h-4 w-4 text-[#2e7d32] focus:ring-[#2e7d32] border-slate-300", checked: idx == 0 %>
+            <span class="material-symbols-outlined text-3xl mb-2 text-slate-400 group-has-[:checked]:text-[#2e7d32]"><%= icons[rt] || "description" %></span>
+            <span class="font-bold text-sm"><%= rt.titleize %></span>
+            <span class="text-xs text-slate-500 mt-1">Automated <%= rt.humanize.downcase %> reporting.</span>
+          </label>
+        <% end %>
+      </div>
+    </section>
+
+    <%# Section 2 & 3: Schedule & Format %>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <section class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+        <div class="flex items-center gap-2 mb-6">
+          <span class="material-symbols-outlined text-[#2e7d32]">schedule</span>
+          <h3 class="text-lg font-bold">2. Frequency</h3>
+        </div>
+        <div class="space-y-4">
+          <%= f.label :schedule, "Schedule", class: "block text-xs font-bold text-slate-500 uppercase mb-1" %>
+          <%= f.select :schedule, ReportAutomation::SCHEDULES.map { |s| [s.capitalize, s] }, {}, class: "w-full rounded-lg border-slate-200 text-sm focus:border-[#2e7d32] focus:ring-[#2e7d32]" %>
+        </div>
+      </section>
+
+      <section class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+        <div class="flex items-center gap-2 mb-6">
+          <span class="material-symbols-outlined text-[#2e7d32]">description</span>
+          <h3 class="text-lg font-bold">3. Export Format</h3>
+        </div>
+        <div class="flex gap-4">
+          <% ReportAutomation::FORMATS.each_with_index do |fmt, idx| %>
+            <% fmt_icons = { "pdf" => "picture_as_pdf", "csv" => "table_view" } %>
+            <% fmt_colors = { "pdf" => "text-red-500", "csv" => "text-green-600" } %>
+            <label class="flex-1 flex items-center justify-center gap-2 p-3 rounded-lg border-2 border-slate-100 cursor-pointer has-[:checked]:border-[#2e7d32] has-[:checked]:bg-[#2e7d32]/5">
+              <%= f.radio_button :format, fmt, class: "sr-only", checked: idx == 0 %>
+              <span class="material-symbols-outlined <%= fmt_colors[fmt] %>"><%= fmt_icons[fmt] %></span>
+              <span class="font-bold text-sm"><%= fmt.upcase %></span>
+            </label>
+          <% end %>
+        </div>
+      </section>
+    </div>
+
+    <%# Section 4: Recipients %>
+    <section class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+      <div class="flex items-center gap-2 mb-6">
+        <span class="material-symbols-outlined text-[#2e7d32]">mail</span>
+        <h3 class="text-lg font-bold">4. Recipients</h3>
+      </div>
+      <%= f.label :recipients, "Email addresses (comma-separated)", class: "block text-xs font-bold text-slate-500 uppercase mb-1" %>
+      <%= f.text_area :recipients, rows: 3, class: "w-full rounded-lg border-slate-200 text-sm focus:border-[#2e7d32] focus:ring-[#2e7d32]", placeholder: "admin@cleancircle.com, manager@cleancircle.com" %>
+    </section>
+
+    <%# Submit %>
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-200">
+      <div class="flex items-center gap-2 text-slate-500">
+        <span class="material-symbols-outlined text-sm">info</span>
+        <p class="text-xs italic">Automations can be paused or edited anytime from your reports dashboard.</p>
+      </div>
+      <div class="flex items-center gap-4 w-full sm:w-auto">
+        <%= link_to "Cancel", admin_report_automations_path, class: "flex-1 sm:flex-none px-8 py-3 rounded-xl border border-slate-200 text-sm font-bold hover:bg-slate-50 transition-colors text-center" %>
+        <%= f.submit "Create Automation", class: "flex-1 sm:flex-none px-10 py-3 rounded-xl bg-[#2e7d32] text-white text-sm font-bold shadow-lg shadow-[#2e7d32]/20 hover:scale-[1.02] transition-transform cursor-pointer" %>
+      </div>
+    </div>
+  <% end %>
+</div>

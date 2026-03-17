@@ -2,157 +2,153 @@
 
 <% content_for :head do %>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <style>.custom-marker { background: transparent !important; border: none !important; }</style>
+  <style>
+    .custom-marker { background: transparent !important; border: none !important; }
+    .marker-fill { font-variation-settings: 'FILL' 1; }
+  </style>
 <% end %>
 
-<div class="mb-5">
-  <div class="flex items-center text-sm text-gray-500 mb-2">
-    <%= link_to "My Routes", agent_routes_path, class: "text-blue-600 hover:text-blue-800" %>
-    <svg class="w-4 h-4 mx-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-    <span class="text-gray-700"><%= @route.name %></span>
-  </div>
-  <div class="flex items-center justify-between">
-    <div>
-      <h1 class="text-xl font-bold text-gray-900"><%= @route.name %></h1>
-      <p class="text-sm text-gray-500 mt-0.5"><%= @route.area %></p>
-    </div>
-    <%= link_to "Start Pickups", agent_route_pickups_path(@route),
-      class: "inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-lg shadow-sm transition" %>
-  </div>
-</div>
-
-<%# Next Pickup highlight card %>
-<% next_household = @households.detect { |h| p = h.pickups.find_by(created_at: Date.current.all_day); p && p.status.in?(%w[scheduled in_progress]) } %>
-<% if next_household %>
-  <% next_pickup = next_household.pickups.find_by(created_at: Date.current.all_day) %>
-  <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
-    <div class="flex items-center justify-between">
-      <div>
-        <p class="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">Next Pickup</p>
-        <p class="text-base font-bold text-gray-900"><%= next_household.address %></p>
-        <p class="text-sm text-gray-600">
-          <% if next_household.building_name.present? %><%= next_household.building_name %><% end %>
-          <% if next_household.unit_number.present? %> Unit <%= next_household.unit_number %><% end %>
-        </p>
-      </div>
-      <%= link_to agent_pickup_path(next_pickup),
-        class: "flex-shrink-0 ml-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-lg shadow-sm transition inline-flex items-center" do %>
-        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-        Go to Pickup
-      <% end %>
-    </div>
-  </div>
-<% end %>
-
-<%# Estimated completion info %>
 <% all_today = @households.map { |h| h.pickups.find_by(created_at: Date.current.all_day) }.compact %>
 <% completed_count = all_today.count { |p| p.status == "completed" } %>
 <% remaining_count = all_today.count { |p| p.status.in?(%w[scheduled in_progress]) } %>
 <% total_count = all_today.size %>
-<div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-4 px-4 py-3">
-  <div class="flex items-center justify-between">
-    <div class="flex items-center space-x-4">
-      <div class="text-center">
-        <p class="text-xl font-bold text-green-600"><%= completed_count %></p>
-        <p class="text-xs text-gray-500">Completed</p>
-      </div>
-      <div class="text-center">
-        <p class="text-xl font-bold text-blue-600"><%= remaining_count %></p>
-        <p class="text-xs text-gray-500">Remaining</p>
-      </div>
-      <div class="text-center">
-        <p class="text-xl font-bold text-gray-700"><%= total_count %></p>
-        <p class="text-xs text-gray-500">Total</p>
-      </div>
-    </div>
-    <div class="text-sm text-gray-600 font-medium">
-      <%= completed_count %> of <%= total_count %> completed, <%= remaining_count %> remaining
-    </div>
-  </div>
-  <% if total_count > 0 %>
-    <div class="mt-2 w-full bg-gray-200 rounded-full h-2">
-      <div class="h-2 rounded-full bg-green-500" style="width: <%= ((completed_count.to_f / total_count) * 100).round %>%"></div>
-    </div>
-  <% end %>
-</div>
+<% next_household = @households.detect { |h| p = h.pickups.find_by(created_at: Date.current.all_day); p && p.status.in?(%w[scheduled in_progress]) } %>
+<% next_pickup = next_household ? next_household.pickups.find_by(created_at: Date.current.all_day) : nil %>
 
-<%# Route Map %>
-<div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-4">
-  <div class="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
-    <h2 class="text-base font-semibold text-gray-900">Route Map</h2>
-    <div class="flex items-center space-x-3 text-xs">
-      <span class="flex items-center"><span class="inline-block w-3 h-3 rounded-full bg-green-600 mr-1"></span>Completed</span>
-      <span class="flex items-center"><span class="inline-block w-3 h-3 rounded-full bg-blue-600 mr-1"></span>Scheduled</span>
-      <span class="flex items-center"><span class="inline-block w-3 h-3 rounded-full bg-red-600 mr-1"></span>Missed</span>
-      <span class="flex items-center"><span class="inline-block w-3 h-3 rounded-full bg-gray-400 mr-1"></span>No Pickup</span>
+<%# Header - overlaid style matching Stitch design %>
+<header class="flex items-center justify-between bg-white/80 backdrop-blur-md p-4 border-b border-slate-200 z-10">
+  <div class="flex items-center gap-3">
+    <%= link_to agent_routes_path, class: "text-slate-900 flex size-10 items-center justify-center rounded-full hover:bg-slate-100 cursor-pointer" do %>
+      <span class="material-symbols-outlined">arrow_back</span>
+    <% end %>
+    <div>
+      <h1 class="text-lg font-bold leading-tight">Today's Route</h1>
+      <p class="text-xs text-slate-500"><%= total_count %> stops &bull; <%= @route.area %></p>
     </div>
   </div>
+  <div class="flex gap-2">
+    <button class="flex size-10 items-center justify-center rounded-full bg-slate-100 text-slate-700">
+      <span class="material-symbols-outlined">search</span>
+    </button>
+    <button class="flex size-10 items-center justify-center rounded-full bg-slate-100 text-slate-700">
+      <span class="material-symbols-outlined">more_vert</span>
+    </button>
+  </div>
+</header>
+
+<%# Main Map Area %>
+<main class="relative flex-1 bg-slate-200 overflow-hidden" style="min-height: 60vh;">
+  <%# Map container %>
   <div
     data-controller="route-map"
     data-route-map-households-value="<%= @household_map_data.to_json %>"
-    style="height: 350px; z-index: 0;"
-    class="rounded-b-xl"
+    class="absolute inset-0"
+    style="z-index: 0;"
   ></div>
-</div>
 
-<%# Households list %>
-<div class="bg-white rounded-xl shadow-sm border border-gray-200">
-  <div class="px-4 py-3 border-b border-gray-200">
-    <h2 class="text-base font-semibold text-gray-900">Households (<%= @households.size %>)</h2>
+  <%# Floating Controls Top Right %>
+  <div class="absolute top-4 right-4 flex flex-col gap-2" style="z-index: 5;">
+    <button class="size-12 flex items-center justify-center rounded-xl bg-white shadow-xl text-slate-700">
+      <span class="material-symbols-outlined">layers</span>
+    </button>
+    <div class="flex flex-col rounded-xl bg-white shadow-xl overflow-hidden">
+      <button class="size-12 flex items-center justify-center border-b border-slate-100 text-slate-700">
+        <span class="material-symbols-outlined">add</span>
+      </button>
+      <button class="size-12 flex items-center justify-center text-slate-700">
+        <span class="material-symbols-outlined">remove</span>
+      </button>
+    </div>
+    <button class="size-12 flex items-center justify-center rounded-xl bg-[#ec5b13] shadow-xl text-white">
+      <span class="material-symbols-outlined marker-fill">my_location</span>
+    </button>
   </div>
 
-  <% if @households.any? %>
-    <ul class="divide-y divide-gray-100">
-      <% @households.each do |household| %>
-        <% today_pickup = household.pickups.find_by(created_at: Date.current.all_day) %>
-        <li>
-          <% if today_pickup %>
-            <%= link_to agent_pickup_path(today_pickup), class: "block px-4 py-3 hover:bg-gray-50 transition" do %>
-              <div class="flex items-center justify-between">
-                <div class="min-w-0 flex-1">
-                  <p class="text-sm font-medium text-gray-900 truncate"><%= household.address %></p>
-                  <p class="text-xs text-gray-500 mt-0.5">
-                    <% if household.building_name.present? %><%= household.building_name %><% end %>
-                    <% if household.unit_number.present? %> Unit <%= household.unit_number %><% end %>
-                  </p>
-                </div>
-                <div class="ml-3 flex-shrink-0 flex items-center space-x-2">
-                  <% case today_pickup.status %>
-                  <% when "scheduled" %>
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Scheduled</span>
-                  <% when "in_progress" %>
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">In Progress</span>
-                  <% when "completed" %>
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Completed</span>
-                  <% when "missed" %>
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Missed</span>
-                  <% end %>
-                  <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                </div>
-              </div>
-            <% end %>
+  <%# Category Pills - Top Left %>
+  <div class="absolute top-4 left-4 flex gap-2 overflow-x-auto max-w-[calc(100%-80px)]" style="z-index: 5; -ms-overflow-style: none; scrollbar-width: none;">
+    <div class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#ec5b13] px-4 shadow-lg text-white">
+      <span class="material-symbols-outlined text-xl">priority_high</span>
+      <p class="text-sm font-semibold">Next Pickup</p>
+    </div>
+    <div class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white px-4 shadow-lg text-slate-700">
+      <span class="material-symbols-outlined text-xl">update</span>
+      <p class="text-sm font-medium">Upcoming</p>
+    </div>
+    <div class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white px-4 shadow-lg text-slate-400">
+      <span class="material-symbols-outlined text-xl">check_circle</span>
+      <p class="text-sm font-medium">Completed</p>
+    </div>
+  </div>
+
+  <%# List View Floating Button %>
+  <div class="absolute bottom-32 left-1/2 -translate-x-1/2" style="z-index: 10;">
+    <%= link_to agent_route_pickups_path(@route), class: "flex items-center justify-center gap-3 rounded-full h-14 px-8 bg-slate-900 text-white shadow-2xl hover:scale-105 transition-transform" do %>
+      <span class="material-symbols-outlined">format_list_bulleted</span>
+      <span class="font-bold tracking-wide">LIST VIEW</span>
+    <% end %>
+  </div>
+
+  <%# Bottom Information Card %>
+  <% if next_household %>
+    <div class="absolute bottom-4 left-4 right-4 bg-white rounded-xl p-4 shadow-2xl border border-slate-200" style="z-index: 5;">
+      <div class="flex justify-between items-start mb-2">
+        <div class="flex flex-col">
+          <span class="text-[10px] font-bold text-[#ec5b13] uppercase tracking-widest">Next Stop</span>
+          <h3 class="text-lg font-bold"><%= next_household.address %></h3>
+        </div>
+        <div class="bg-[#ec5b13]/10 text-[#ec5b13] px-3 py-1 rounded-full text-xs font-bold">
+          <% if next_pickup&.scheduled_time.present? %>
+            ETA <%= next_pickup.scheduled_time.strftime("%-I:%M %p") %>
           <% else %>
-            <div class="px-4 py-3">
-              <div class="flex items-center justify-between">
-                <div class="min-w-0 flex-1">
-                  <p class="text-sm font-medium text-gray-900 truncate"><%= household.address %></p>
-                  <p class="text-xs text-gray-500 mt-0.5">
-                    <% if household.building_name.present? %><%= household.building_name %><% end %>
-                    <% if household.unit_number.present? %> Unit <%= household.unit_number %><% end %>
-                  </p>
-                </div>
-                <div class="ml-3 flex-shrink-0">
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">No Pickup</span>
-                </div>
-              </div>
-            </div>
+            Next
           <% end %>
-        </li>
-      <% end %>
-    </ul>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 text-sm text-slate-500">
+        <div class="flex items-center gap-1">
+          <span class="material-symbols-outlined text-sm">distance</span>
+          <%= @route.area %>
+        </div>
+        <div class="flex items-center gap-1">
+          <span class="material-symbols-outlined text-sm">recycling</span>
+          <% if next_pickup %>
+            <%= next_pickup.waste_type&.titleize || "Mixed Waste" %>
+          <% else %>
+            Mixed Waste
+          <% end %>
+        </div>
+      </div>
+    </div>
   <% else %>
-    <div class="px-4 py-8 text-center text-sm text-gray-400">
-      No households on this route.
+    <div class="absolute bottom-4 left-4 right-4 bg-white rounded-xl p-4 shadow-2xl border border-slate-200" style="z-index: 5;">
+      <div class="flex justify-between items-start mb-2">
+        <div class="flex flex-col">
+          <span class="text-[10px] font-bold text-[#ec5b13] uppercase tracking-widest">Route Info</span>
+          <h3 class="text-lg font-bold"><%= @route.name %></h3>
+        </div>
+        <div class="bg-[#ec5b13]/10 text-[#ec5b13] px-3 py-1 rounded-full text-xs font-bold">
+          <%= completed_count %>/<%= total_count %>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 text-sm text-slate-500">
+        <div class="flex items-center gap-1">
+          <span class="material-symbols-outlined text-sm">check_circle</span>
+          <%= completed_count %> completed
+        </div>
+        <div class="flex items-center gap-1">
+          <span class="material-symbols-outlined text-sm">pending_actions</span>
+          <%= remaining_count %> remaining
+        </div>
+      </div>
     </div>
   <% end %>
-</div>
+
+  <%# Progress bar overlay at top of map %>
+  <% if total_count > 0 %>
+    <div class="absolute top-16 left-4 right-20" style="z-index: 5;">
+      <div class="w-full bg-white/60 backdrop-blur rounded-full h-1.5 shadow-sm">
+        <div class="h-1.5 rounded-full bg-[#ec5b13]" style="width: <%= ((completed_count.to_f / total_count) * 100).round %>%"></div>
+      </div>
+    </div>
+  <% end %>
+</main>

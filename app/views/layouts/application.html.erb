@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="h-full bg-gray-50">
+<html class="h-full" lang="en">
   <head>
     <title><%= content_for(:title) || "CleanCircle" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -9,103 +9,243 @@
     <%= csp_meta_tag %>
     <%= yield :head %>
     <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+    <style>
+      body { font-family: 'Public Sans', sans-serif; }
+      .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
   </head>
 
-  <body class="h-full">
-    <% if user_signed_in? %>
-      <nav class="bg-emerald-700 shadow-lg" data-controller="mobile-menu">
+  <body class="h-full bg-[#f8f6f6]">
+    <% if user_signed_in? && current_user.customer? %>
+      <%# === CUSTOMER LAYOUT === %>
+      <div class="flex h-screen overflow-hidden">
+        <%# Desktop Sidebar Navigation %>
+        <aside class="hidden md:flex flex-col w-64 bg-white border-r border-slate-200 shrink-0">
+          <div class="p-6 flex items-center gap-3">
+            <div class="bg-[#ec5b13] p-2 rounded-lg text-white">
+              <span class="material-symbols-outlined text-2xl">recycling</span>
+            </div>
+            <%= link_to root_path, class: "text-xl font-bold tracking-tight text-[#ec5b13] hover:opacity-80 transition-opacity" do %>
+              CleanCircle
+            <% end %>
+          </div>
+          <nav class="flex-1 px-4 space-y-1 mt-2">
+            <% nav_items = [
+              { path: root_path, icon: "home", label: "Home", matcher: "dashboard" },
+              { path: pickups_path, icon: "local_shipping", label: "Services", matcher: "pickup" },
+              { path: wallet_path, icon: "account_balance_wallet", label: "Wallet", matcher: "wallet" },
+              { path: pickups_path, icon: "history", label: "History", matcher: "history_pickups" },
+              { path: profile_path, icon: "settings", label: "Settings", matcher: "profile" }
+            ] %>
+            <% nav_items.each do |item| %>
+              <% is_active = (item[:matcher] == "dashboard" && controller_name == "dashboard") ||
+                             (item[:matcher] == "pickup" && controller_name == "pickups" && item[:label] == "Services") ||
+                             (item[:matcher] == "wallet" && controller_name == "wallets") ||
+                             (item[:matcher] == "profile" && controller_name == "profiles") %>
+              <%= link_to item[:path], class: "flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all #{is_active ? 'bg-[#ec5b13]/10 text-[#ec5b13] font-semibold' : 'text-slate-600 hover:bg-slate-100'}" do %>
+                <span class="material-symbols-outlined" <%= 'style="font-variation-settings: \'FILL\' 1;"'.html_safe if is_active %>><%= item[:icon] %></span>
+                <span><%= item[:label] %></span>
+              <% end %>
+            <% end %>
+
+            <div class="pt-4 border-t border-slate-100 mt-4 space-y-1">
+              <%= link_to eco_stats_path, class: "flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all #{controller_name == 'eco_stats' ? 'bg-[#ec5b13]/10 text-[#ec5b13]' : 'text-slate-600 hover:bg-slate-100'}" do %>
+                <span class="material-symbols-outlined">monitoring</span>
+                <span>Eco Stats</span>
+              <% end %>
+              <%= link_to rewards_path, class: "flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all #{controller_name == 'rewards' ? 'bg-[#ec5b13]/10 text-[#ec5b13]' : 'text-slate-600 hover:bg-slate-100'}" do %>
+                <span class="material-symbols-outlined">military_tech</span>
+                <span>Rewards</span>
+              <% end %>
+              <%= link_to leaderboard_path, class: "flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all #{controller_name == 'leaderboard' ? 'bg-[#ec5b13]/10 text-[#ec5b13]' : 'text-slate-600 hover:bg-slate-100'}" do %>
+                <span class="material-symbols-outlined">leaderboard</span>
+                <span>Leaderboard</span>
+              <% end %>
+              <%= link_to subscriptions_path, class: "flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all #{controller_name == 'subscriptions' ? 'bg-[#ec5b13]/10 text-[#ec5b13]' : 'text-slate-600 hover:bg-slate-100'}" do %>
+                <span class="material-symbols-outlined">card_membership</span>
+                <span>Subscription</span>
+              <% end %>
+              <%= link_to support_tickets_path, class: "flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all #{controller_name == 'support_tickets' ? 'bg-[#ec5b13]/10 text-[#ec5b13]' : 'text-slate-600 hover:bg-slate-100'}" do %>
+                <span class="material-symbols-outlined">support_agent</span>
+                <span>Support</span>
+              <% end %>
+            </div>
+          </nav>
+          <div class="p-4 border-t border-slate-200">
+            <div class="bg-slate-50 p-4 rounded-xl mb-3">
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Pro Plan</p>
+              <p class="text-sm text-slate-600 mb-3">Get advanced analytics and local rewards.</p>
+              <%= link_to subscriptions_path, class: "block w-full py-2 bg-[#ec5b13] text-white rounded-lg text-sm font-bold text-center hover:brightness-110 transition-all" do %>Upgrade Now<% end %>
+            </div>
+            <div class="flex items-center gap-3 px-3 py-2">
+              <div class="w-9 h-9 rounded-full bg-[#ec5b13] text-white flex items-center justify-center font-bold text-sm">
+                <%= current_user.name&.first&.upcase %>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-slate-900 truncate"><%= current_user.name %></p>
+                <p class="text-xs text-slate-500 truncate"><%= current_user.email %></p>
+              </div>
+            </div>
+            <%= button_to destroy_user_session_path, method: :delete, data: { turbo: false }, class: "w-full mt-2 flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-red-600 bg-slate-50 hover:bg-red-50 rounded-xl transition-colors" do %>
+              <span class="material-symbols-outlined text-xl">logout</span>
+              Sign Out
+            <% end %>
+          </div>
+        </aside>
+
+        <%# Main Content Area %>
+        <main class="flex-1 overflow-y-auto bg-[#f8f6f6] pb-20 md:pb-0">
+          <%# Top Header Bar %>
+          <header class="sticky top-0 z-10 bg-[#f8f6f6]/80 backdrop-blur-md px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between border-b border-slate-200/60">
+            <div class="flex items-center gap-3 md:hidden">
+              <div class="bg-[#ec5b13] p-1.5 rounded-lg text-white">
+                <span class="material-symbols-outlined text-xl">recycling</span>
+              </div>
+              <span class="text-lg font-bold tracking-tight text-[#ec5b13]">CleanCircle</span>
+            </div>
+            <div class="hidden md:block">
+              <h2 class="text-2xl font-bold text-slate-900"><%= content_for(:page_title) || "Dashboard" %></h2>
+              <p class="text-slate-500 text-sm">Welcome back, <%= current_user.name&.split(' ')&.first %>!</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <%= link_to notifications_path, class: "relative flex h-10 w-10 items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors" do %>
+                <span class="material-symbols-outlined text-xl">notifications</span>
+                <% unread_count = current_user.notifications.unread.count %>
+                <% if unread_count > 0 %>
+                  <span class="absolute -top-1 -right-1 w-5 h-5 bg-[#ec5b13] text-white text-[10px] font-bold rounded-full flex items-center justify-center"><%= unread_count > 9 ? "9+" : unread_count %></span>
+                <% end %>
+              <% end %>
+              <%= link_to profile_path, class: "flex h-10 w-10 items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors" do %>
+                <span class="material-symbols-outlined text-xl">account_circle</span>
+              <% end %>
+              <%= button_to destroy_user_session_path, method: :delete, data: { turbo: false }, class: "flex h-10 w-10 items-center justify-center rounded-xl bg-white border border-slate-200 text-red-500 hover:bg-red-50 transition-colors" do %>
+                <span class="material-symbols-outlined text-xl">logout</span>
+              <% end %>
+            </div>
+          </header>
+
+          <%# Flash Messages %>
+          <% if notice.present? %>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4" data-controller="flash">
+              <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl flex justify-between items-center" role="alert">
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-green-600">check_circle</span>
+                  <span class="text-sm font-medium"><%= notice %></span>
+                </div>
+                <button data-action="click->flash#dismiss" class="text-green-500 hover:text-green-700">
+                  <span class="material-symbols-outlined text-xl">close</span>
+                </button>
+              </div>
+            </div>
+          <% end %>
+          <% if alert.present? %>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4" data-controller="flash">
+              <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex justify-between items-center" role="alert">
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-red-600">error</span>
+                  <span class="text-sm font-medium"><%= alert %></span>
+                </div>
+                <button data-action="click->flash#dismiss" class="text-red-500 hover:text-red-700">
+                  <span class="material-symbols-outlined text-xl">close</span>
+                </button>
+              </div>
+            </div>
+          <% end %>
+
+          <%# Page Content %>
+          <div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+            <%= yield %>
+          </div>
+        </main>
+      </div>
+
+      <%# Mobile Bottom Tab Navigation %>
+      <nav class="fixed bottom-0 left-0 right-0 z-30 md:hidden bg-white/95 backdrop-blur-md border-t border-slate-200 px-2 pb-5 pt-2 safe-area-inset-bottom">
+        <div class="flex justify-between items-center max-w-md mx-auto">
+          <% mobile_tabs = [
+            { path: root_path, icon: "home", label: "Home", active: controller_name == "dashboard" },
+            { path: pickups_path, icon: "local_shipping", label: "Services", active: controller_name == "pickups" || controller_name == "subscriptions" },
+            { path: wallet_path, icon: "account_balance_wallet", label: "Wallet", active: controller_name == "wallets" },
+            { path: rewards_path, icon: "military_tech", label: "Rewards", active: controller_name == "rewards" || controller_name == "waste_tracking" },
+            { path: profile_path, icon: "person", label: "Profile", active: controller_name == "profiles" }
+          ] %>
+          <% mobile_tabs.each do |tab| %>
+            <%= link_to tab[:path], class: "flex flex-col items-center gap-1 px-3 #{tab[:active] ? 'text-[#ec5b13]' : 'text-slate-400'}" do %>
+              <span class="material-symbols-outlined text-2xl" <%= 'style="font-variation-settings: \'FILL\' 1;"'.html_safe if tab[:active] %>><%= tab[:icon] %></span>
+              <span class="text-[10px] font-<%= tab[:active] ? 'bold' : 'medium' %> leading-normal"><%= tab[:label] %></span>
+            <% end %>
+          <% end %>
+        </div>
+      </nav>
+
+    <% elsif user_signed_in? %>
+      <%# === NON-CUSTOMER SIGNED IN LAYOUT (agents, admins - fallback) === %>
+      <nav class="bg-[#ec5b13] shadow-lg" data-controller="mobile-menu">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex justify-between h-16">
             <div class="flex items-center">
               <a href="<%= root_path %>" class="text-white text-xl font-bold tracking-tight">
                 CleanCircle
               </a>
-              <% if current_user.customer? %>
-                <div class="hidden md:flex ml-10 space-x-4">
-                  <%= link_to "Dashboard", root_path, class: "text-emerald-100 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
-                  <%= link_to "Pickups", pickups_path, class: "text-emerald-100 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
-                  <%= link_to "Wallet", wallet_path, class: "text-emerald-100 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
-                  <%= link_to "Subscription", subscriptions_path, class: "text-emerald-100 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
-                  <%= link_to "Waste Tracking", waste_tracking_path, class: "text-emerald-100 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
-                  <%= link_to "Rewards", rewards_path, class: "text-emerald-100 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
-                </div>
-              <% end %>
             </div>
-            <!-- Mobile menu button -->
-            <button class="md:hidden text-emerald-100 hover:text-white" data-action="click->mobile-menu#toggle">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-            </button>
-
-            <div class="hidden md:flex items-center space-x-4">
-              <% if current_user.customer? %>
-                <%= link_to notifications_path, class: "relative text-emerald-100 hover:text-white" do %>
-                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-                  <% unread_count = current_user.notifications.unread.count %>
-                  <% if unread_count > 0 %>
-                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center"><%= unread_count > 9 ? "9+" : unread_count %></span>
-                  <% end %>
-                <% end %>
-              <% end %>
-              <span class="text-emerald-100 text-sm"><%= current_user.name %></span>
-              <%= button_to "Sign Out", destroy_user_session_path, method: :delete, class: "text-emerald-100 hover:text-white text-sm bg-emerald-800 px-3 py-1.5 rounded-md" %>
+            <div class="flex items-center space-x-4">
+              <span class="text-orange-100 text-sm"><%= current_user.name %></span>
+              <%= button_to "Sign Out", destroy_user_session_path, method: :delete, class: "text-orange-100 hover:text-white text-sm bg-orange-700 px-3 py-1.5 rounded-md" %>
             </div>
           </div>
         </div>
       </nav>
 
-      <!-- Mobile menu overlay -->
-      <div data-mobile-menu-target="overlay" class="hidden md:hidden fixed inset-0 z-40">
-        <div class="fixed inset-0 bg-black/50" data-action="click->mobile-menu#close"></div>
-        <div data-mobile-menu-target="sidebar" class="fixed inset-y-0 left-0 w-64 bg-emerald-800 transform -translate-x-full transition-transform duration-300 z-50">
-          <div class="p-4 space-y-4">
-            <div class="flex justify-between items-center mb-4">
-              <span class="text-white font-bold text-lg">CleanCircle</span>
-              <button data-action="click->mobile-menu#close" class="text-emerald-200 hover:text-white">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-              </button>
-            </div>
-            <% if current_user.customer? %>
-              <%= link_to "Dashboard", root_path, class: "block text-emerald-100 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
-              <%= link_to "Pickups", pickups_path, class: "block text-emerald-100 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
-              <%= link_to "Wallet", wallet_path, class: "block text-emerald-100 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
-              <%= link_to "Subscription", subscriptions_path, class: "block text-emerald-100 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
-              <%= link_to "Waste Tracking", waste_tracking_path, class: "block text-emerald-100 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
-              <%= link_to "Rewards", rewards_path, class: "block text-emerald-100 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
-              <%= link_to "Notifications", notifications_path, class: "block text-emerald-100 hover:text-white px-3 py-2 rounded-md text-sm font-medium" %>
-            <% end %>
-            <div class="border-t border-emerald-600 pt-4">
-              <span class="block text-emerald-200 text-sm px-3 mb-2"><%= current_user.name %></span>
-              <%= button_to "Sign Out", destroy_user_session_path, method: :delete, class: "w-full text-left text-emerald-100 hover:text-white text-sm bg-emerald-900 px-3 py-2 rounded-md" %>
-            </div>
+      <% if notice.present? %>
+        <div class="max-w-7xl mx-auto px-4 mt-4" data-controller="flash">
+          <div class="bg-orange-50 border border-orange-200 text-orange-700 px-4 py-3 rounded-lg flex justify-between items-center" role="alert">
+            <span><%= notice %></span>
+            <button data-action="click->flash#dismiss" class="text-orange-500 hover:text-orange-700">&times;</button>
           </div>
         </div>
-      </div>
-    <% end %>
-
-    <% if notice.present? %>
-      <div class="max-w-7xl mx-auto px-4 mt-4" data-controller="flash">
-        <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-lg flex justify-between items-center" role="alert">
-          <span><%= notice %></span>
-          <button data-action="click->flash#dismiss" class="text-emerald-500 hover:text-emerald-700">&times;</button>
+      <% end %>
+      <% if alert.present? %>
+        <div class="max-w-7xl mx-auto px-4 mt-4" data-controller="flash">
+          <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex justify-between items-center" role="alert">
+            <span><%= alert %></span>
+            <button data-action="click->flash#dismiss" class="text-red-500 hover:text-red-700">&times;</button>
+          </div>
         </div>
-      </div>
-    <% end %>
-    <% if alert.present? %>
-      <div class="max-w-7xl mx-auto px-4 mt-4" data-controller="flash">
-        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex justify-between items-center" role="alert">
-          <span><%= alert %></span>
-          <button data-action="click->flash#dismiss" class="text-red-500 hover:text-red-700">&times;</button>
+      <% end %>
+
+      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <%= yield %>
+      </main>
+
+    <% else %>
+      <%# === SIGNED OUT LAYOUT === %>
+      <% if notice.present? %>
+        <div class="max-w-7xl mx-auto px-4 mt-4" data-controller="flash">
+          <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex justify-between items-center" role="alert">
+            <span><%= notice %></span>
+            <button data-action="click->flash#dismiss" class="text-green-500 hover:text-green-700">&times;</button>
+          </div>
         </div>
-      </div>
-    <% end %>
+      <% end %>
+      <% if alert.present? %>
+        <div class="max-w-7xl mx-auto px-4 mt-4" data-controller="flash">
+          <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex justify-between items-center" role="alert">
+            <span><%= alert %></span>
+            <button data-action="click->flash#dismiss" class="text-red-500 hover:text-red-700">&times;</button>
+          </div>
+        </div>
+      <% end %>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <%= yield %>
-    </main>
+      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <%= yield %>
+      </main>
 
-    <% if !user_signed_in? || current_user.customer? %>
       <footer class="bg-gray-800 text-gray-400 py-8 mt-auto">
         <div class="max-w-7xl mx-auto px-4 text-center text-sm">
           <p>&copy; <%= Date.current.year %> CleanCircle. Building a cleaner tomorrow.</p>

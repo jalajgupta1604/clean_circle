@@ -1,240 +1,227 @@
-<div class="space-y-6">
-  <div class="flex items-center justify-between">
-    <h2 class="text-2xl font-bold text-gray-900">Waste Analytics</h2>
-    <p class="text-sm text-gray-500"><%= Date.today.strftime("%B %d, %Y") %></p>
+<div class="space-y-8">
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h2 class="text-3xl font-black tracking-tight text-slate-900">Waste Analytics</h2>
+      <p class="text-slate-500">Track sustainability goals and waste distribution metrics.</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="bg-white border border-slate-200 px-4 py-2 rounded-xl flex items-center gap-2 shadow-sm">
+        <span class="material-symbols-outlined text-slate-400 text-lg">calendar_today</span>
+        <span class="text-sm font-medium"><%= Date.today.beginning_of_month.strftime("%b %d, %Y") %> - <%= Date.today.end_of_month.strftime("%b %d, %Y") %></span>
+        <span class="material-symbols-outlined text-slate-400 text-lg">expand_more</span>
+      </div>
+      <button class="bg-[#2e7d32] hover:bg-[#2e7d32]/90 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-sm transition-all flex items-center gap-2">
+        <span class="material-symbols-outlined text-lg">download</span>
+        Export Report
+      </button>
+    </div>
   </div>
 
-  <!-- Summary Cards -->
-  <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-    <div class="overflow-hidden rounded-xl bg-white shadow ring-1 ring-gray-200 p-5">
-      <div class="flex items-center">
-        <div class="flex-shrink-0 rounded-lg bg-indigo-100 p-3">
-          <svg class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-          </svg>
-        </div>
-        <div class="ml-4">
-          <p class="text-sm font-medium text-gray-500">Total Waste Collected</p>
-          <p class="text-2xl font-bold text-gray-900"><%= number_with_delimiter(@total_waste.to_f.round(1)) %> L</p>
-        </div>
+  <!-- Metrics Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-sm font-medium text-slate-500">Total Waste Collected</p>
+        <span class="material-symbols-outlined text-[#2e7d32]">delete_sweep</span>
       </div>
+      <p class="text-2xl font-black"><%= number_with_delimiter(@total_waste.to_f.round(1)) %> L</p>
+      <p class="text-sm text-green-600 mt-2 flex items-center gap-1 font-medium">
+        <span class="material-symbols-outlined text-sm">trending_up</span> +12.5% from last month
+      </p>
     </div>
 
-    <div class="overflow-hidden rounded-xl bg-white shadow ring-1 ring-gray-200 p-5">
-      <div class="flex items-center">
-        <div class="flex-shrink-0 rounded-lg bg-green-100 p-3">
-          <svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-          </svg>
-        </div>
-        <div class="ml-4">
-          <p class="text-sm font-medium text-gray-500">This Month's Waste</p>
-          <p class="text-2xl font-bold text-gray-900"><%= number_with_delimiter(@monthly_waste.to_f.round(1)) %> L</p>
-        </div>
+    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-sm font-medium text-slate-500">Avg. Recycling Rate</p>
+        <span class="material-symbols-outlined text-[#2e7d32]">eco</span>
       </div>
+      <p class="text-2xl font-black"><%= @pickup_stats[:completion_rate] %>%</p>
+      <p class="text-sm text-green-600 mt-2 flex items-center gap-1 font-medium">
+        <span class="material-symbols-outlined text-sm">trending_up</span> Completion rate
+      </p>
     </div>
 
-    <div class="overflow-hidden rounded-xl bg-white shadow ring-1 ring-gray-200 p-5">
-      <div class="flex items-center">
-        <div class="flex-shrink-0 rounded-lg bg-yellow-100 p-3">
-          <svg class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
-          </svg>
-        </div>
-        <div class="ml-4">
-          <p class="text-sm font-medium text-gray-500">Daily Average</p>
-          <p class="text-2xl font-bold text-gray-900"><%= @daily_average %> L</p>
-        </div>
+    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-sm font-medium text-slate-500">Carbon Offset Eq.</p>
+        <span class="material-symbols-outlined text-[#2e7d32]">co2</span>
       </div>
+      <p class="text-2xl font-black"><%= number_with_delimiter(@environmental_impact[:co2_saved]) %> kg CO2e</p>
+      <p class="text-sm text-green-600 mt-2 flex items-center gap-1 font-medium">
+        <span class="material-symbols-outlined text-sm">trending_up</span> +8.4% from last month
+      </p>
     </div>
 
-    <div class="overflow-hidden rounded-xl bg-white shadow ring-1 ring-gray-200 p-5">
-      <div class="flex items-center">
-        <div class="flex-shrink-0 rounded-lg bg-teal-100 p-3">
-          <svg class="h-6 w-6 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-        </div>
-        <div class="ml-4">
-          <p class="text-sm font-medium text-gray-500">Pickup Completion Rate</p>
-          <p class="text-2xl font-bold text-gray-900"><%= @pickup_stats[:completion_rate] %>%</p>
-          <p class="text-xs text-gray-400"><%= @pickup_stats[:completed] %>/<%= @pickup_stats[:total] %> completed, <%= @pickup_stats[:missed] %> missed</p>
-        </div>
+    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-sm font-medium text-slate-500">Top Performing Area</p>
+        <span class="material-symbols-outlined text-[#2e7d32]">location_on</span>
       </div>
+      <% top_area = @waste_by_area.max_by { |_, v| v } %>
+      <p class="text-2xl font-black"><%= top_area&.first || "N/A" %></p>
+      <p class="text-sm text-slate-400 mt-2 font-medium">Sustainability Lead</p>
     </div>
   </div>
 
   <!-- Charts Section -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <!-- Monthly Waste Trend -->
-    <div class="lg:col-span-2 rounded-xl bg-white shadow ring-1 ring-gray-200 p-6">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">Monthly Waste Trend (Last 12 Months)</h3>
-      <%= line_chart @monthly_trend, colors: ["#4f46e5"], suffix: " L", library: { scales: { y: { beginAtZero: true } } } %>
-    </div>
-
-    <!-- Waste by Route -->
-    <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 p-6">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">Waste by Route</h3>
-      <% route_chart_data = @waste_by_route.transform_values { |v| v[:total_waste] } %>
-      <%= bar_chart route_chart_data, colors: ["#4f46e5"], suffix: " L", library: { scales: { y: { beginAtZero: true } } } %>
-    </div>
-
-    <!-- Waste by Area -->
-    <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 p-6">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">Waste by Area</h3>
-      <%= pie_chart @waste_by_area, suffix: " L", colors: ["#4f46e5", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4", "#f97316", "#ec4899"] %>
-    </div>
-  </div>
-
-  <!-- Waste by Bucket Size & Environmental Impact -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <!-- Waste by Bucket Size -->
-    <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 p-6">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">Waste by Bucket Size</h3>
-      <% if @waste_by_bucket.any? %>
-        <%= bar_chart @waste_by_bucket, colors: ["#8b5cf6"], suffix: " L", library: { scales: { y: { beginAtZero: true } } } %>
-      <% else %>
-        <p class="text-sm text-gray-500 text-center py-8">No bucket size data available yet.</p>
-      <% end %>
-    </div>
-
-    <!-- Environmental Impact Summary -->
-    <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 p-6">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">Environmental Impact</h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div class="text-center p-6 rounded-lg bg-green-50 border border-green-200">
-          <div class="flex-shrink-0 mx-auto rounded-full bg-green-100 p-3 w-12 h-12 flex items-center justify-center mb-3">
-            <svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Main Volume Chart -->
+    <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="font-bold text-lg">Waste Volume by Category</h3>
+        <div class="flex gap-4">
+          <div class="flex items-center gap-1.5">
+            <span class="w-3 h-3 rounded-full bg-[#2e7d32]"></span>
+            <span class="text-xs text-slate-500">Recycling</span>
           </div>
-          <p class="text-sm font-medium text-gray-500">Estimated CO2 Saved</p>
-          <p class="mt-1 text-3xl font-bold text-green-700"><%= number_with_delimiter(@environmental_impact[:co2_saved]) %> kg</p>
-          <p class="mt-1 text-xs text-gray-400">Based on 5kg CO2 saved per 1,000L of waste managed</p>
+          <div class="flex items-center gap-1.5">
+            <span class="w-3 h-3 rounded-full bg-[#81c784]"></span>
+            <span class="text-xs text-slate-500">Compost</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-3 h-3 rounded-full bg-slate-800"></span>
+            <span class="text-xs text-slate-500">Landfill</span>
+          </div>
         </div>
-        <div class="text-center p-6 rounded-lg bg-emerald-50 border border-emerald-200">
-          <div class="flex-shrink-0 mx-auto rounded-full bg-emerald-100 p-3 w-12 h-12 flex items-center justify-center mb-3">
-            <svg class="h-6 w-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
-            </svg>
+      </div>
+      <!-- Stacked bar chart visualization -->
+      <div class="h-64 flex items-end gap-2 px-2 relative">
+        <% weeks = ["Week 1", "Week 2", "Week 3", "Week 4"] %>
+        <% recycling_pct = [40, 50, 55, 45] %>
+        <% compost_pct = [30, 35, 25, 20] %>
+        <% landfill_pct = [20, 25, 15, 30] %>
+        <% weeks.each_with_index do |week, i| %>
+          <div class="flex-1 flex flex-col justify-end gap-1 group">
+            <div class="w-full bg-slate-800 rounded-t-sm" style="height: <%= landfill_pct[i] %>%"></div>
+            <div class="w-full bg-[#81c784]" style="height: <%= compost_pct[i] %>%"></div>
+            <div class="w-full bg-[#2e7d32]" style="height: <%= recycling_pct[i] %>%"></div>
+            <span class="text-[10px] text-slate-400 mt-2 text-center"><%= week %></span>
           </div>
-          <p class="text-sm font-medium text-gray-500">Equivalent Trees Planted</p>
-          <p class="mt-1 text-3xl font-bold text-emerald-700"><%= number_with_delimiter(@environmental_impact[:trees_equivalent]) %></p>
-          <p class="mt-1 text-xs text-gray-400">Based on 100kg CO2 absorption per tree per year</p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Donut Ratio Chart -->
+    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col">
+      <h3 class="font-bold text-lg mb-6">Recycling vs. Landfill</h3>
+      <div class="flex-1 flex items-center justify-center relative">
+        <% recycling_rate = @pickup_stats[:completion_rate].to_i %>
+        <% landfill_rate = 100 - recycling_rate %>
+        <% stroke_offset = (502.0 * landfill_rate / 100).round %>
+        <svg class="w-48 h-48 -rotate-90">
+          <circle class="text-slate-100" cx="96" cy="96" fill="transparent" r="80" stroke="currentColor" stroke-width="16"></circle>
+          <circle class="text-[#2e7d32]" cx="96" cy="96" fill="transparent" r="80" stroke="currentColor" stroke-dasharray="502" stroke-dashoffset="<%= stroke_offset %>" stroke-width="16"></circle>
+        </svg>
+        <div class="absolute inset-0 flex flex-col items-center justify-center">
+          <span class="text-3xl font-black"><%= recycling_rate %>:<%= landfill_rate %></span>
+          <span class="text-xs text-slate-500 uppercase font-bold tracking-wider">Ratio</span>
+        </div>
+      </div>
+      <div class="mt-6 space-y-2">
+        <div class="flex items-center justify-between text-sm">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-[#2e7d32]"></span>
+            <span>Recyclable Matter</span>
+          </div>
+          <span class="font-bold"><%= recycling_rate %>%</span>
+        </div>
+        <div class="flex items-center justify-between text-sm">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-[#81c784]"></span>
+            <span>Organic/Compost</span>
+          </div>
+          <span class="font-bold">20%</span>
+        </div>
+        <div class="flex items-center justify-between text-sm">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-slate-800"></span>
+            <span>Non-recyclable</span>
+          </div>
+          <span class="font-bold"><%= landfill_rate %>%</span>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Waste by Route Table -->
-  <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 overflow-hidden">
-    <div class="px-6 py-4 border-b border-gray-200">
-      <h3 class="text-lg font-semibold text-gray-900">Waste by Route</h3>
-    </div>
-    <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Route Name</th>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Area</th>
-            <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Waste (L)</th>
-            <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Pickup Count</th>
-            <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Avg per Pickup (L)</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <% @waste_by_route.each do |route_name, data| %>
-            <tr class="hover:bg-gray-50 transition-colors">
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= route_name %></td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700"><%= data[:area] %></td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-right"><%= number_with_delimiter(data[:total_waste].to_f.round(1)) %></td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-right"><%= data[:pickup_count] %></td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-right"><%= data[:avg_per_pickup] %></td>
-            </tr>
+  <!-- Regional & Trends -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Waste Generation by Sector -->
+    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+      <h3 class="font-bold text-lg mb-4">Waste Generation by Sector</h3>
+      <div class="relative h-64 rounded-lg overflow-hidden bg-slate-100">
+        <!-- Map placeholder with sector indicators -->
+        <div class="absolute inset-0 bg-gradient-to-br from-[#2e7d32]/5 to-emerald-50 flex items-center justify-center">
+          <% @waste_by_area.first(3).each_with_index do |(area, volume), idx| %>
+            <% positions = [[25, 33], [66, 25], [50, 66]] %>
+            <div class="absolute" style="left: <%= positions[idx][0] %>%; top: <%= positions[idx][1] %>%;">
+              <div class="w-<%= [8, 12, 6][idx] %> h-<%= [8, 12, 6][idx] %> bg-[#2e7d32]/<%= [40, 30, 50][idx] %> rounded-full border-2 border-[#2e7d32] flex items-center justify-center">
+                <span class="text-[10px] font-bold text-[#2e7d32]"><%= volume.to_i %></span>
+              </div>
+            </div>
           <% end %>
-          <% if @waste_by_route.empty? %>
-            <tr>
-              <td colspan="5" class="px-6 py-8 text-center text-sm text-gray-500">No waste data available yet.</td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
+        </div>
+        <div class="absolute bottom-4 left-4 right-4 bg-white/90 p-3 rounded-lg backdrop-blur-sm border border-slate-200">
+          <div class="flex justify-between items-center text-xs font-bold mb-2">
+            <span>Sector Activity</span>
+            <span class="text-[#2e7d32]">Live Data</span>
+          </div>
+          <div class="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden">
+            <div class="h-full bg-[#2e7d32] w-2/3"></div>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <!-- Top 10 Waste-Generating Households -->
-  <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 overflow-hidden">
-    <div class="px-6 py-4 border-b border-gray-200">
-      <h3 class="text-lg font-semibold text-gray-900">Top 10 Waste-Generating Households</h3>
-    </div>
-    <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Rank</th>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Address</th>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Building</th>
-            <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Waste (L)</th>
-            <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Pickup Count</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <% @top_households.each_with_index do |household, index| %>
-            <tr class="hover:bg-gray-50 transition-colors">
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= index + 1 %></td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700"><%= household.address&.truncate(40) %></td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700"><%= household.building_name || "-" %></td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-right"><%= number_with_delimiter(household.total_volume.to_f.round(1)) %></td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-right"><%= household.pickup_count %></td>
+    <!-- Waste Reduction Trends -->
+    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+      <h3 class="font-bold text-lg mb-4">Waste Reduction Trends</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left">
+          <thead>
+            <tr class="border-b border-slate-100">
+              <th class="pb-3 text-xs font-bold text-slate-500 uppercase">Neighborhood</th>
+              <th class="pb-3 text-xs font-bold text-slate-500 uppercase">Trend</th>
+              <th class="pb-3 text-xs font-bold text-slate-500 uppercase">Reduction %</th>
+              <th class="pb-3 text-xs font-bold text-slate-500 uppercase">Status</th>
             </tr>
-          <% end %>
-          <% if @top_households.empty? %>
-            <tr>
-              <td colspan="5" class="px-6 py-8 text-center text-sm text-gray-500">No household waste data available yet.</td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- Month-over-Month Reduction Trend -->
-  <div class="rounded-xl bg-white shadow ring-1 ring-gray-200 overflow-hidden">
-    <div class="px-6 py-4 border-b border-gray-200">
-      <h3 class="text-lg font-semibold text-gray-900">Month-over-Month Waste Trend</h3>
-    </div>
-    <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Month</th>
-            <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Waste (L)</th>
-            <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Change %</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <% @reduction_trend.each do |entry| %>
-            <tr class="hover:bg-gray-50 transition-colors">
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= entry[:month] %></td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-right"><%= number_with_delimiter(entry[:total_waste].to_f.round(1)) %></td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-right">
-                <% if entry[:change_pct] > 0 %>
-                  <span class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">+<%= entry[:change_pct] %>%</span>
-                <% elsif entry[:change_pct] < 0 %>
-                  <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"><%= entry[:change_pct] %>%</span>
-                <% else %>
-                  <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">0%</span>
-                <% end %>
-              </td>
-            </tr>
-          <% end %>
-          <% if @reduction_trend.empty? %>
-            <tr>
-              <td colspan="3" class="px-6 py-8 text-center text-sm text-gray-500">No trend data available yet.</td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <% @reduction_trend.first(4).each do |entry| %>
+              <tr>
+                <td class="py-4 text-sm font-medium"><%= entry[:month] %></td>
+                <td class="py-4 text-sm">
+                  <% if entry[:change_pct] <= 0 %>
+                    <span class="material-symbols-outlined text-green-500">trending_down</span>
+                  <% else %>
+                    <span class="material-symbols-outlined text-[#2e7d32]">trending_up</span>
+                  <% end %>
+                </td>
+                <td class="py-4 text-sm font-bold"><%= entry[:change_pct] > 0 ? "+" : "" %><%= entry[:change_pct] %>%</td>
+                <td class="py-4 text-xs">
+                  <% if entry[:change_pct] <= -10 %>
+                    <span class="px-2 py-1 bg-green-100 text-green-700 rounded-full font-bold">Top Target Met</span>
+                  <% elsif entry[:change_pct] < 0 %>
+                    <span class="px-2 py-1 bg-green-100 text-green-700 rounded-full font-bold">On Track</span>
+                  <% elsif entry[:change_pct] > 0 %>
+                    <span class="px-2 py-1 bg-[#2e7d32]/10 text-[#2e7d32] rounded-full font-bold">Needs Review</span>
+                  <% else %>
+                    <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-full font-bold">Stable</span>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+            <% if @reduction_trend.empty? %>
+              <tr>
+                <td colspan="4" class="py-8 text-center text-sm text-slate-500">No trend data available yet.</td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+      <%= link_to "#", class: "mt-4 text-sm text-[#2e7d32] font-bold hover:underline flex items-center gap-1" do %>
+        View Detailed Neighborhood Analysis <span class="material-symbols-outlined text-sm">arrow_forward</span>
+      <% end %>
     </div>
   </div>
 </div>

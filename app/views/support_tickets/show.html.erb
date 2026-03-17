@@ -1,0 +1,146 @@
+<%# Ticket Details %>
+<% content_for(:page_title) { "Ticket Details" } %>
+
+<div class="max-w-3xl mx-auto space-y-6">
+  <%# Back Link %>
+  <div>
+    <%= link_to support_tickets_path, class: "inline-flex items-center gap-1 text-sm text-slate-500 hover:text-[#ec5b13] transition-colors" do %>
+      <span class="material-symbols-outlined text-lg">arrow_back</span>
+      Back to Tickets
+    <% end %>
+  </div>
+
+  <%# Ticket Info Card %>
+  <div class="bg-white border border-slate-100 rounded-xl p-5 shadow-sm">
+    <div class="flex justify-between items-start mb-4">
+      <div>
+        <h2 class="text-xl font-bold text-slate-900"><%= @ticket.ticket_number %></h2>
+        <p class="text-slate-500 text-sm">Submitted <%= @ticket.created_at.strftime("%b %d, %I:%M %p") %></p>
+      </div>
+      <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider
+        <%= case @ticket.status
+            when 'submitted' then 'bg-yellow-100 text-yellow-700'
+            when 'under_review' then 'bg-[#ec5b13]/10 text-[#ec5b13]'
+            when 'resolved' then 'bg-green-100 text-green-700'
+            end %>">
+        <%= @ticket.status.titleize %>
+      </span>
+    </div>
+
+    <div class="flex items-center gap-4 p-3 bg-slate-50 rounded-lg">
+      <div class="flex items-center justify-center rounded-lg bg-[#ec5b13]/20 text-[#ec5b13] shrink-0 w-12 h-12">
+        <span class="material-symbols-outlined">
+          <% case @ticket.category %>
+          <% when 'Missed Pickup' %>delete_sweep
+          <% when 'Damaged Bin' %>delete_sweep
+          <% when 'Incomplete Collection' %>warning
+          <% when 'Spillage' %>water_drop
+          <% else %>help
+          <% end %>
+        </span>
+      </div>
+      <div class="flex flex-col justify-center">
+        <p class="text-slate-900 text-base font-semibold"><%= @ticket.category %></p>
+        <% if @ticket.pickup %>
+          <p class="text-slate-500 text-sm">Related Pickup: #<%= @ticket.pickup.id %> &mdash; <%= @ticket.pickup.created_at&.strftime("%b %d, %Y") %></p>
+        <% end %>
+      </div>
+    </div>
+
+    <% if @ticket.description.present? %>
+      <div class="mt-4 p-3 bg-slate-50 rounded-lg">
+        <p class="text-sm text-slate-700"><%= @ticket.description %></p>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Status Timeline %>
+  <div class="bg-white border border-slate-100 rounded-xl p-6 shadow-sm">
+    <h3 class="text-base font-bold text-slate-900 mb-6">Status Timeline</h3>
+    <div class="space-y-8 relative">
+      <%# Step 1: Submitted %>
+      <div class="relative flex gap-4">
+        <div class="absolute left-4 top-8 -bottom-2 w-0.5 bg-[#ec5b13]"></div>
+        <div class="z-10 flex w-8 h-8 items-center justify-center rounded-full bg-[#ec5b13] text-white">
+          <span class="material-symbols-outlined text-sm">check</span>
+        </div>
+        <div>
+          <p class="text-slate-900 font-semibold">Submitted</p>
+          <p class="text-slate-500 text-xs"><%= @ticket.created_at.strftime("%b %d, %I:%M %p") %></p>
+        </div>
+      </div>
+
+      <%# Step 2: Under Review %>
+      <div class="relative flex gap-4">
+        <% if !@ticket.resolved? %>
+          <div class="absolute left-4 top-8 -bottom-2 w-0.5 bg-slate-200"></div>
+        <% else %>
+          <div class="absolute left-4 top-8 -bottom-2 w-0.5 bg-[#ec5b13]"></div>
+        <% end %>
+        <div class="z-10 flex w-8 h-8 items-center justify-center rounded-full
+          <%= (@ticket.under_review? || @ticket.resolved?) ? 'bg-[#ec5b13] text-white' : 'bg-[#ec5b13]/20 border-2 border-[#ec5b13] text-[#ec5b13]' %>">
+          <span class="material-symbols-outlined text-sm"><%= (@ticket.under_review? || @ticket.resolved?) ? 'check' : 'schedule' %></span>
+        </div>
+        <div>
+          <p class="<%= @ticket.submitted? ? 'text-[#ec5b13] font-bold' : 'text-slate-900 font-semibold' %>">Under Review</p>
+          <p class="text-slate-500 text-xs"><%= @ticket.under_review? ? 'Assigning a supervisor' : @ticket.resolved? ? 'Completed' : 'Assigning a supervisor' %></p>
+        </div>
+      </div>
+
+      <%# Step 3: Resolved %>
+      <div class="relative flex gap-4">
+        <div class="z-10 flex w-8 h-8 items-center justify-center rounded-full
+          <%= @ticket.resolved? ? 'bg-[#ec5b13] text-white' : 'bg-slate-100 text-slate-400' %>">
+          <span class="material-symbols-outlined text-sm">done_all</span>
+        </div>
+        <div>
+          <p class="<%= @ticket.resolved? ? 'text-slate-900 font-semibold' : 'text-slate-400 font-medium' %>">Resolved</p>
+          <p class="text-slate-400 text-xs"><%= @ticket.resolved? ? @ticket.resolved_at&.strftime("%b %d, %I:%M %p") : 'Awaiting completion' %></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# Conversation Thread %>
+  <div class="bg-white border border-slate-100 rounded-xl shadow-sm">
+    <div class="flex items-center justify-between p-5 border-b border-slate-100">
+      <h3 class="text-base font-bold text-slate-900">Messages</h3>
+      <span class="text-xs text-[#ec5b13] font-medium px-2 py-0.5 bg-[#ec5b13]/10 rounded">Ops Team</span>
+    </div>
+
+    <div class="p-4 space-y-4 max-h-[500px] overflow-y-auto">
+      <% @messages.each do |message| %>
+        <% if message.from_admin? %>
+          <%# Operator Message %>
+          <div class="flex flex-col items-start max-w-[85%]">
+            <div class="bg-slate-100 p-3 rounded-xl rounded-tl-none">
+              <p class="text-sm text-slate-800"><%= message.body %></p>
+            </div>
+            <span class="text-[10px] text-slate-400 mt-1 ml-1">Operations &bull; <%= message.created_at.strftime("%I:%M %p") %></span>
+          </div>
+        <% else %>
+          <%# User Message %>
+          <div class="flex flex-col items-end ml-auto max-w-[85%]">
+            <div class="bg-[#ec5b13] p-3 rounded-xl rounded-tr-none shadow-sm">
+              <p class="text-sm text-white"><%= message.body %></p>
+            </div>
+            <span class="text-[10px] text-slate-400 mt-1 mr-1">You &bull; <%= message.created_at.strftime("%I:%M %p") %></span>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+
+    <% unless @ticket.resolved? %>
+      <div class="p-4 border-t border-slate-100">
+        <%= form_with url: add_message_support_ticket_path(@ticket), method: :post, class: "flex items-center gap-2 bg-slate-100 rounded-full px-4 py-2" do %>
+          <textarea name="message[body]" rows="1" required
+                    placeholder="Type a message..."
+                    class="flex-1 bg-transparent border-none focus:ring-0 text-sm text-slate-900 py-1 resize-none placeholder-slate-400"></textarea>
+          <button type="submit" class="bg-[#ec5b13] text-white w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-sm">send</span>
+          </button>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

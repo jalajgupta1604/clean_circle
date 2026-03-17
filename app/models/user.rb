@@ -11,6 +11,9 @@ class User < ApplicationRecord
   has_many :notifications, dependent: :destroy
   has_many :assigned_routes, class_name: "Route", foreign_key: :agent_id, dependent: :nullify
   has_many :pickups, foreign_key: :agent_id, dependent: :nullify
+  has_many :support_tickets, dependent: :destroy
+  has_many :user_badges, dependent: :destroy
+  has_many :badges, through: :user_badges
 
   validates :name, presence: true
   validates :phone, uniqueness: true, allow_blank: true
