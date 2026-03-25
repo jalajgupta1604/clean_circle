@@ -34,7 +34,7 @@ gem "rqrcode"
 gem "phonelib"
 
 # Pagination
-gem "pagy", "~> 9.0"
+gem "pagy", "~> 43.4"
 
 # CSV export (required explicitly in Ruby 3.4+)
 gem "csv"
